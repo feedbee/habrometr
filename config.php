@@ -17,6 +17,22 @@
  *  along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-$config['db']['user'] = 'habrometr';
-$config['db']['pass'] = 'hjk789a1';
-$config['db']['name'] = 'habrometr';
+/**
+ * This config script defines secret values (username, pass, db name)
+ * for DB commection.
+ * 
+ * All the values was excluded from svn repository. I've put them into
+ * simple php-file ./pass.php as constants. If you like to define your
+ * values right here, you can do it. I this case delete first three
+ * lines of code in this file and replace constants in bottom with real
+ * values. But, be carefull with svn updates in this way.
+ */
+
+if (!file_exists('./pass.php'))
+	die('Read some comments in config.php!');
+
+require('pass.php');
+
+$config['db']['user'] = DBUSER;
+$config['db']['pass'] = DBPASS;
+$config['db']['name'] = DBNAME;
