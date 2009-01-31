@@ -1,6 +1,6 @@
 <?php
 
-class XMemcache extends Memcache
+class Lpf_Memcache extends Memcache
 {
 	private $_namespace = null;
 	
