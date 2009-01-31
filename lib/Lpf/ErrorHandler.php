@@ -21,7 +21,7 @@
  * Handler for uncatched exceptions.
  *
  */
-class ErrorHandler
+class Lpf_ErrorHandler
 {
 	/**
 	 * Handler for uncatched exceptions.

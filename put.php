@@ -17,8 +17,12 @@
  *  along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-require_once('ErrorHandler.php');
-set_exception_handler(array('ErrorHandler', 'exceptionHandler'));
+set_include_path(realpath('./lib') . PATH_SEPARATOR . get_include_path());
+require('Lpf/Loader.php');
+
+Lpf_Loader::loadClass('Lpf_ErrorHandler');
+set_exception_handler(array('Lpf_ErrorHandler', 'exceptionHandler'));
+Lpf_Loader::registerAutoload();
 set_time_limit(1800);
 
 if (isset($_SERVER['REQUEST_METHOD']))
@@ -27,8 +31,7 @@ if (isset($_SERVER['REQUEST_METHOD']))
 	die('Forbidden');
 }
 
-require_once('Habrometr.php');
-$h = Habrometr::getInstance();
+$h = Habrometr_Model::getInstance();
 $users = $h->getUserList();
 $errorCounter = 0;
 foreach ($users as $user)

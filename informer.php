@@ -17,11 +17,12 @@
  *  along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-require_once('./ErrorHandler.php');
-require_once('./Habrometr_Informer.php');
-require_once('./Habrometr.php');
+set_include_path(realpath('./lib') . PATH_SEPARATOR . get_include_path());
+require('Lpf/Loader.php');
 
-set_exception_handler(array('ErrorHandler', 'exceptionHandler'));
+Lpf_Loader::loadClass('Lpf_ErrorHandler');
+set_exception_handler(array('Lpf_ErrorHandler', 'exceptionHandler'));
+Lpf_Loader::registerAutoload();
 
 if (isset($_GET['user']))
 {
@@ -57,9 +58,10 @@ else
 }
 
 $className = "Habrometr_Informer_{$width}x{$height}";
-if (file_exists("./$className.php"))
+$fileName = "./lib/Habrometr/Informer/{$width}x{$height}.php";
+if (file_exists($fileName))
 {
-	require_once("./$className.php");
+	require_once($fileName);
 }
 else
 {

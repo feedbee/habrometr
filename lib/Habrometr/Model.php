@@ -27,7 +27,7 @@
  * @license GNU General Public License (GPL).
  * @version 0.5.0
  */
-class Habrometr
+class Habrometr_Model
 {
 	const VERSION_FULL = '0.5.0';
 	const VERSION = '0.5';
@@ -53,7 +53,7 @@ class Habrometr
 	 */
 	private function __construct()
 	{
-		$this->_connect();
+		$this->_connect(Config::DB_NAME, Config::DB_USER, Config::DB_PASS);
 	}
 
 	/**
@@ -65,7 +65,7 @@ class Habrometr
 	{
 		if (!self::$_instance)
 		{
-			self::$_instance = new Habrometr();
+			self::$_instance = new Habrometr_Model();
 		}
 
 		return self::$_instance;

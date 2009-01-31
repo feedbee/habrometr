@@ -21,11 +21,8 @@ set_include_path(realpath('./lib') . PATH_SEPARATOR . get_include_path());
 require('Lpf/Loader.php');
 
 Lpf_Loader::loadClass('Lpf_ErrorHandler');
-set_exception_handler(array('ErrorHandler', 'exceptionHandler'));
-//require_once('Habrometr.php');
-//require_once('Memcache.php');
-
-require('config.php');
+set_exception_handler(array('Lpf_ErrorHandler', 'exceptionHandler'));
+Lpf_Loader::registerAutoload();
 
 // Routing
 if (isset($_GET['action']))
@@ -45,7 +42,6 @@ else
 
 // Dispatch
 ob_start();
-//require './Dispatcher.php';
 Lpf_Dispatcher::dispatch(null, $actionProcessed);
 $cont = ob_get_flush();
 

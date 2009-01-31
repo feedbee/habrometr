@@ -10,7 +10,7 @@ class IndexController
 		if (isset($_GET['user']))
 		{
 			$this->_userCode = $_GET['user'];
-			if (!($this->_userId = (int)(Habrometr::getInstance()->code2UserId($this->_userCode))))
+			if (!($this->_userId = (int)(Habrometr_Model::getInstance()->code2UserId($this->_userCode))))
 				throw new Exception('Error: user not found.');
 		}
 		else
@@ -22,8 +22,8 @@ class IndexController
 	
 	public function allUsersAction()
 	{
-		$view = Dispatcher::getView();
-		$view->userList = Habrometr::getInstance()->getUserList();
+		$view = Lpf_Dispatcher::getView();
+		$view->userList = Habrometr_Model::getInstance()->getUserList();
 	}
 	
 	public function registerAction()
@@ -52,7 +52,7 @@ class IndexController
 			{
 				try
 				{
-					$habravaluesFromXML = Habrometr::getInstance()->parsePage($user_code);
+					$habravaluesFromXML = Habrometr_Model::getInstance()->parsePage($user_code);
 				}
 				catch(Exception $e)
 				{
@@ -68,7 +68,7 @@ class IndexController
 			}
 			if (!$errors)
 			{
-				if (!is_null(Habrometr::getInstance()->code2UserId($user_code)))
+				if (!is_null(Habrometr_Model::getInstance()->code2UserId($user_code)))
 				{
 					$errors[] = "Вы (<a href=\"./?action=user_page&user={$user_code}\">{$user_code}</a>) уже зарегистрированы в системе. Повторная регистрация невозможна.";
 				}
@@ -77,23 +77,23 @@ class IndexController
 			// Ошибок нет, надо регить юезра
 			if (!$errors)
 			{
-				if ($userId = Habrometr::getInstance()->addUser(array('user_code' => $user_code, 'user_email' => $user_email)))
+				if ($userId = Habrometr_Model::getInstance()->addUser(array('user_code' => $user_code, 'user_email' => $user_email)))
 				{
 					$ok = true;
 					try
 					{
-						Habrometr::getInstance()->putValuesFromArray($userId, $habravaluesFromXML);
+						Habrometr_Model::getInstance()->putValuesFromArray($userId, $habravaluesFromXML);
 					}
 					catch (Exception $e)
 					{}
-					$m = new XMemcache('habrometr');
+					$m = new Lpf_Memcache('habrometr');
 					$m->delete('/users/');
 				}
 			}
 		}
 		
-		$view = Dispatcher::getView();
-		$user = Habrometr::getInstance()->getUser($this->_userId);
+		$view = Lpf_Dispatcher::getView();
+		$user = Habrometr_Model::getInstance()->getUser($this->_userId);
 		$view->userCode = $user_code;
 		$view->userEmail = $user_email;
 		$view->errors = $errors;
@@ -102,26 +102,26 @@ class IndexController
 	
 	public function userPageAction()
 	{
-		$view = Dispatcher::getView();
-		$view->userData = Habrometr::getInstance()->getUser($this->_userId);
-		$view->current = Habrometr::getInstance()->getValues($this->_userId);
-		$view->history = Habrometr::getInstance()->getHistory($this->_userId, 500);
+		$view = Lpf_Dispatcher::getView();
+		$view->userData = Habrometr_Model::getInstance()->getUser($this->_userId);
+		$view->current = Habrometr_Model::getInstance()->getValues($this->_userId);
+		$view->history = Habrometr_Model::getInstance()->getHistory($this->_userId, 500);
 	}
 	
 	public function getAction()
 	{
-		$view = Dispatcher::getView();
+		$view = Lpf_Dispatcher::getView();
 		$view->sizes = array(
 			array('x' => 425, 'y' => 120),
 			array('x' => 88,  'y' => 120),
 			array('x' => 88,  'y' => 15)
 		);
-		$user = Habrometr::getInstance()->getUser($this->_userId);
+		$user = Habrometr_Model::getInstance()->getUser($this->_userId);
 		$view->userCode = $user['user_code'];
 	}
 	
 	public function defaultAction()
 	{
-		Dispatcher::getView()->version = Habrometr::VERSION;
+		Lpf_Dispatcher::getView()->version = Habrometr_Model::VERSION;
 	}
 }

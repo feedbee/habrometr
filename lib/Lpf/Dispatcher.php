@@ -54,7 +54,7 @@ class Lpf_Dispatcher
 			throw new Exception("Action name '{$action}' include bad characters");
 		}
 		
-		require_once("./{$controller}Controller.php"); // only one controller presents at this time
+		require_once("./controllers/{$controller}Controller.php"); // only one controller presents at this time
 		if (!class_exists($controller . 'Controller'))
 		{
 			throw new Exception("Controller class {$controller}Controller was not found");
@@ -86,7 +86,6 @@ class Lpf_Dispatcher
 	{
 		if (is_null(self::$_viewInstance))
 		{
-			require_once('./View.php');
 			self::$_viewInstance = new Lpf_View();
 		}
 		

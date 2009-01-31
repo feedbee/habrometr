@@ -17,8 +17,6 @@
  *  along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-require_once('Habrometr_Informer.php');
-
 /**
  * Habrometr Informer 425x120
  * 
@@ -39,7 +37,7 @@ class Habrometr_Informer_425x120 extends Habrometr_Informer
 	private $_max_karma = null;
 	private $_log_time = null;
 	
-	public function __construct($user, Habrometr $h = null)
+	public function __construct($user, Habrometr_Model $h = null)
 	{
 		parent::__construct($user, self::WIDTH, self::HEIGHT, $h);
 	}

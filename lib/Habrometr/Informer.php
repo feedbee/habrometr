@@ -40,9 +40,9 @@ class Habrometr_Informer
 	 * @param string $user
 	 * @param int $width
 	 * @param int $height
-	 * @param Habrometr $habrometr
+	 * @param Habrometr_Model $habrometr
 	 */
-	public function __construct($user, $width, $height, Habrometr $habrometr = null)
+	public function __construct($user, $width, $height, Habrometr_Model $habrometr = null)
 	{
 		$this->_width = $width;
 		$this->_height = $height;
@@ -53,7 +53,7 @@ class Habrometr_Informer
 		}
 		else
 		{
-			$this->_habrometr = Habrometr::getInstance();
+			$this->_habrometr = Habrometr_Model::getInstance();
 		}
 		if (!$this->_userId = $this->_habrometr->code2UserId($this->_user))
 		{

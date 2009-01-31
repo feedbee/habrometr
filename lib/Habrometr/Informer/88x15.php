@@ -17,26 +17,23 @@
  *  along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-require_once('Habrometr_Informer.php');
-
 /**
- * Habrometr Informer 88x120
+ * Habrometr Informer 88x15
  * 
  * @version 1.0
  * @author feedbee
  * @copyright 2009 feedbee
  *
  */
-class Habrometr_Informer_88x120 extends Habrometr_Informer
+class Habrometr_Informer_88x15 extends Habrometr_Informer
 {
 	const WIDTH = 88;
-	const HEIGHT = 120;
+	const HEIGHT = 15;
 	
 	private $_karma = null;
 	private $_habraforce = null;
-	private $_extremums = null;
 	
-	public function __construct($user, Habrometr $h = null)
+	public function __construct($user, Habrometr_Model $h = null)
 	{
 		parent::__construct($user, self::WIDTH, self::HEIGHT, $h);
 	}
@@ -44,15 +41,12 @@ class Habrometr_Informer_88x120 extends Habrometr_Informer
 	public function prepare()
 	{
 		// Process karma values
-		$values = $this->_habrometr->getValues($this->_userId, 20);
-		if (!$values)
-			$this->_showError('History not found');
-		$this->_extremums = $this->_habrometr->getExtremums($this->_userId);
-		if (!$this->_extremums)
-			$this->_showError('Max or min values calculation error');
+		$this->_data = $this->_habrometr->getValues($this->_userId, 20);
+		if (!$this->_data)
+			$this->_showError('User values not found');
 		
-		$this->_karma = $values['karma_value'];
-		$this->_habraforce = $values['habraforce'];
+		$this->_karma = $this->_data['karma_value'];
+		$this->_habraforce = $this->_data['habraforce'];
 		
 		return true;
 	}
@@ -85,54 +79,43 @@ class Habrometr_Informer_88x120 extends Habrometr_Informer
 		$draw->setFillColor($color['bg']);
 		$draw->setStrokeColor($color['habr']);
 		$draw->polyline(array(
-			array('x' => 0,	'y' => 0),
+			array('x' => 0,				  'y' => 0),
 			array('x' => self::WIDTH - 1, 'y' => 0),
 			array('x' => self::WIDTH - 1, 'y' => self::HEIGHT - 1),
-			array('x' => 0,	'y' => self::HEIGHT - 1),
-			array('x' => 0,	'y' => 0)
+			array('x' => 0,				  'y' => self::HEIGHT - 1),
+			array('x' => 0,				  'y' => 0)
 		));
 		$this->_canvas->drawImage($draw);
 		$draw->destroy();
 		
 		// Draw texts
 		$draw = new ImagickDraw();
-		$draw->setTextUnderColor($color['bg']);
 		$draw->setTextAlignment(Imagick::ALIGN_CENTER);
 		$draw->setTextAntialias(true);
-		$draw->setFillColor($color['text']);
-		$draw->setFont(realpath('stuff/arialbd.ttf'));
-		$code = $this->_user;
-		$draw->setFontSize(strlen($code) > 8 ? 10 : 11);
-		if (strlen($code) > 10)
-		{
-			$code = substr($code, 0, 9) . '...';
-		}
-		$draw->annotation(self::WIDTH / 2, self::HEIGHT - 9, $code);
 		
-		$draw->setFont(realpath('stuff/consola.ttf'));
+		$draw->setFillColor($color['karma']);
+		$draw->polyline(array(
+			array('x' => 1, 			  'y' => 1),
+			array('x' => self::WIDTH / 2, 'y' => 1),
+			array('x' => self::WIDTH / 2, 'y' => self::HEIGHT - 2),
+			array('x' => 1,				  'y' => self::HEIGHT - 2),
+			array('x' => 1,				  'y' => 1)
+		));
+		$draw->setFillColor($color['bg']);
 		$draw->setFontSize(11);
-		$draw->setFillColor($color['neutral']);
-		$draw->annotation(self::WIDTH / 2, 15, "хаброметр");
-		
-		$draw->setFillColor($color['karma']);
-		$text = sprintf('%01.2f', $this->_extremums['karma_min']) . ' / ' . sprintf('%01.2f', $this->_extremums['karma_max']);
-		$draw->setFontSize(9);
-		$draw->setFillColor($color['karma']);
-		$draw->annotation(self::WIDTH / 2, 55, $text);
-		
-		$text = sprintf('%01.2f', $this->_extremums['habraforce_min']) . ' / ' . sprintf('%01.2f', $this->_extremums['habraforce_max']);
-		$draw->setFontSize(9);
-		$draw->setFillColor($color['force']);
-		$draw->annotation(self::WIDTH / 2, 95, $text);
-		
-		$draw->setTextUnderColor($color['karma']);
-		$draw->setFillColor($color['bg']);
-		$draw->setFontSize(14);
 		$draw->setFont(realpath('stuff/consolab.ttf'));
-		$draw->annotation(self::WIDTH / 2, 35, sprintf('%01.2f', $this->_karma));
-		$draw->setTextUnderColor($color['force']);
+		$draw->annotation(self::WIDTH / 4, 11, sprintf('%01.2f', $this->_karma));
+		
+		$draw->setFillColor($color['force']);
+		$draw->polyline(array(
+			array('x' => self::WIDTH / 2 + 1,	'y' => 1),
+			array('x' => self::WIDTH - 2, 		'y' => 1),
+			array('x' => self::WIDTH - 2, 		'y' => self::HEIGHT - 2),
+			array('x' => self::WIDTH / 2 + 1,	'y' => self::HEIGHT - 2),
+			array('x' => self::WIDTH / 2 + 1,	'y' => 1)
+		));
 		$draw->setFillColor($color['bg']);
-		$draw->annotation(self::WIDTH / 2, 75, sprintf('%01.2f', $this->_habraforce));
+		$draw->annotation(self::WIDTH / 4 * 3, 11, sprintf('%01.2f', $this->_habraforce));
 		
 		$this->_canvas->drawImage($draw);
 		$draw->destroy();
