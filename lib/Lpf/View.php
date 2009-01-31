@@ -21,14 +21,21 @@
  * Simple MVC view component implementation.
  * TODO: helpers & menu helper
  */
-class View
+class Lpf_View
 {
 	/**
-	 * Template variables store
+	 * Template variables storage
 	 *
 	 * @var array
 	 */
-	private $_variables; 
+	private $_variables;
+
+	/**
+	 * Helpers storage
+	 * 
+	 * @var array
+	 */
+	private $_helpers;
 	
 	/**
 	 * Initialize the object
@@ -100,5 +107,10 @@ class View
 			require_once($filename);
 		}
 		return null;
+	}
+	
+	public function addHelper()
+	{
+		
 	}
 }

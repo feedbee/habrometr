@@ -25,12 +25,12 @@
  * @link http://habrometr.ru/
  * @copyright 2009, feedbee@gmail.com.
  * @license GNU General Public License (GPL).
- * @version 0.4.2
+ * @version 0.5.0
  */
 class Habrometr
 {
-	const VERSION_FULL = '0.4.2';
-	const VERSION = '0.4';
+	const VERSION_FULL = '0.5.0';
+	const VERSION = '0.5';
 
 	/**
 	 * Reference
@@ -75,13 +75,11 @@ class Habrometr
 	 * Establish DB connection
 	 *
 	 */
-	private function _connect()
+	private function _connect($dbName, $userName, $userPass)
 	{
-		require 'config.php';
-		
 		try
 		{
-			$this->_pdo = new PDO('mysql:host=localhost;dbname=' . $config['db']['name'], $config['db']['user'], $config['db']['pass']);
+			$this->_pdo = new PDO('mysql:host=localhost;dbname=' . $dbName, $userName, $userPass);
 		}
 		catch (PDOException $e)
 		{

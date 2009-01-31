@@ -20,12 +20,12 @@
 /**
  * Simple dispatcher. Implements the simplest logic of loading action by request
  */
-class Dispatcher
+class Lpf_Dispatcher
 {
 	/**
 	 * View instance for actions
 	 *
-	 * @var View
+	 * @var Lpf_View
 	 */
 	static private $_viewInstance = null;
 	
@@ -71,7 +71,7 @@ class Dispatcher
 		
 		$body = self::getView()->render($action);
 		
-		$page = new View();
+		$page = new Lpf_View();
 		$page->body = $body;
 		$page->title = 'Хаброметр';
 		$page->render('page', false);
@@ -80,14 +80,14 @@ class Dispatcher
 	/**
 	 * Get standart view instance.
 	 *
-	 * @return View
+	 * @return Lpf_View
 	 */
 	static public function getView()
 	{
 		if (is_null(self::$_viewInstance))
 		{
 			require_once('./View.php');
-			self::$_viewInstance = new View();
+			self::$_viewInstance = new Lpf_View();
 		}
 		
 		return self::$_viewInstance;

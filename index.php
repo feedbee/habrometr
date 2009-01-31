@@ -17,13 +17,17 @@
  *  along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-require_once('ErrorHandler.php');
+set_include_path(realpath('./lib') . PATH_SEPARATOR . get_include_path());
+require('Lpf/Loader.php');
+
+Lpf_Loader::loadClass('Lpf_ErrorHandler');
 set_exception_handler(array('ErrorHandler', 'exceptionHandler'));
-require_once('Habrometr.php');
-require_once('XMemcache.php');
+//require_once('Habrometr.php');
+//require_once('Memcache.php');
 
-define('SERVICE_URL', 'http://habrometr.ru/');
+require('config.php');
 
+// Routing
 if (isset($_GET['action']))
 {
 	$action = $_GET['action'];
@@ -41,14 +45,14 @@ else
 
 // Dispatch
 ob_start();
-require './Dispatcher.php';
-Dispatcher::dispatch(null, $actionProcessed);
+//require './Dispatcher.php';
+Lpf_Dispatcher::dispatch(null, $actionProcessed);
 $cont = ob_get_flush();
 
 // Cache
 if ($cont && $action != 'register')
 {
 	$cacheTime = array('default' => 30 * 60, 'user_page' => 15 * 60, 'all_users' => 30 * 60, 'get' => 5 * 60);
-	$m = new XMemcache('habrometr');
+	$m = new Lpf_Memcache('habrometr');
 	$m->set($_SERVER['REQUEST_URI'], $cont . "\r\n<!-- cached version " . date('r') . ' -->', 0, isset($cacheTime[$action]) ? $cacheTime[$action] : 10 * 60);
 }

@@ -1,6 +1,6 @@
 <p><strong>О Хаброметре</strong> <a href="./users/">Список всех пользователей</a> <a href="./register/">Регистрация</a></p>
 <h1><img src="./stuff/logo.png" width="185" height="130" alt="Хаброметр (Habrometr)" title="Хаброметр (Habrometr)" align="left" />Хаброметр (Habrometr) — сбор и графическое отображение показателей хабраюзеров</h1>
-<address>Версия Habrometr <?php print $this->version; ?> beta 2 (testing)</address>
+<address>Версия Habrometr <?php print $this->version; ?> beta 3 (testing)</address>
 <p>Хаброметр — новая система сбора мониторинга кармы и хабрасилы. Пока находится на стадии разработки. Автор — <a href="http://valera.ws/">Валера Леонтьев</a> (<a href="http://feedbee.habrahabr.ru/">feedbee</a>).</p>
 <p>Связь с автором по e-mail или jabber: <a href="mailto:feedbee@gmail.com">feedbee@gmail.com</a>.</p>
 <h2>Сбор информации</h2>

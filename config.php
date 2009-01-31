@@ -33,6 +33,11 @@ if (!file_exists('./pass.php'))
 
 require('pass.php');
 
-$config['db']['user'] = DBUSER;
-$config['db']['pass'] = DBPASS;
-$config['db']['name'] = DBNAME;
+class Config
+{
+	const DB_USER = DBUSER;
+	const DB_PASS = DBPASS;
+	const DB_NAME = DBNAME;
+	
+	const SERVICE_URL = 'http://habrometr.ru/';
+}
