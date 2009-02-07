@@ -25,11 +25,11 @@
  * @link http://habrometr.ru/
  * @copyright 2009, feedbee@gmail.com.
  * @license GNU General Public License (GPL).
- * @version 0.5.0
+ * @version 0.5.1
  */
 class Habrometr_Model
 {
-	const VERSION_FULL = '0.5.0';
+	const VERSION_FULL = '0.5.1';
 	const VERSION = '0.5';
 
 	/**
@@ -59,7 +59,7 @@ class Habrometr_Model
 	/**
 	 * Singleton. Returns instance of Habrometr class
 	 *
-	 * @return Habrometr
+	 * @return Habrometr_Model
 	 */
 	public static function getInstance()
 	{
@@ -129,7 +129,7 @@ class Habrometr_Model
 	 */
 	private function _getUserLog($userId = 1, $count = 1)
 	{
-		$sth = $this->_pdo->prepare("SELECT karma_value, karma_votes, habraforce, rate_position, DATE_ADD(log_time, INTERVAL 2 HOUR) as log_time
+		$sth = $this->_pdo->prepare("SELECT karma_value, habraforce, rate_position, DATE_ADD(log_time, INTERVAL 2 HOUR) as log_time
 								FROM `karmalog` where user_id = :uid order by log_time DESC limit :limit");
 		$sth->bindValue(':limit', $count, PDO::PARAM_INT);
 		$sth->bindValue(':uid', $userId, PDO::PARAM_INT);
@@ -191,13 +191,12 @@ class Habrometr_Model
 		$values = array(
 			'user_id' => $userId,
 			'karma_value' => (float)$values['karma']['value'],
-			'karma_votes' => (int)$values['karma']['votes'],
 			'habraforce' => (float)$values['habraforce']['value'],
 			'rate_position' => (int)$values['rate']['value']
 		);
 		try
 		{
-			$sth = $this->_pdo->prepare("INSERT `karmalog` (user_id, karma_value, karma_votes, habraforce, rate_position) VALUES (?, ?, ?, ?, ?)");
+			$sth = $this->_pdo->prepare("INSERT `karmalog` (user_id, karma_value, habraforce, rate_position) VALUES (?, ?, ?, ?)");
 			$sth->execute(array_values($values));
 		}
 		catch (Exception $e)
@@ -244,11 +243,10 @@ class Habrometr_Model
 			
 			if ($e = $xml->xpath('/habrauser/error'))
 			{
-				throw new Exception('Error value received: ' . $e, 404);
+				throw new Exception('Error value received: ' . $e, 205);
 			}
 				
 			$data['karma']['value'] = $xml->karma;
-			$data['karma']['votes'] = 0;
 			$data['habraforce']['value'] = $xml->rating;
 			$data['rate']['value'] = $xml->ratingPosition;
 		}
@@ -369,7 +367,7 @@ class Habrometr_Model
 		}
 		catch (Exception $e)
 		{
-			throw new Exception('User addition — DB query failed: ' . $e->getMessage(), 211);
+			throw new Exception('User addition — DB query failed: ' . $e->getMessage(), 206);
 		}
 
 		return $this->_pdo->lastInsertId();
@@ -393,7 +391,7 @@ class Habrometr_Model
 		}
 		catch (Exception $e)
 		{
-			throw new Exception('User deletation — DB query failed: ' . $e->getMessage(), 212);
+			throw new Exception('User deletation — DB query failed: ' . $e->getMessage(), 206);
 		}
 
 		return true;
@@ -418,7 +416,7 @@ class Habrometr_Model
 		}
 		catch (Exception $e)
 		{
-			throw new Exception('User update — DB query failed: ' . $e->getMessage(), 213);
+			throw new Exception('User update — DB query failed: ' . $e->getMessage(), 207);
 		}
 
 		return true;
@@ -447,7 +445,7 @@ class Habrometr_Model
 		}
 		catch (Exception $e)
 		{
-			throw new Exception("Getting user code by id failure: " . $e->getMessage(), 205);
+			throw new Exception("Getting user code by id failure: " . $e->getMessage(), 208);
 		}
 
 		if ($row)
@@ -485,7 +483,7 @@ class Habrometr_Model
 		}
 		catch (Exception $e)
 		{
-			throw new Exception("Getting user if by code failure: " . $e->getMessage(), 205);
+			throw new Exception("Getting user if by code failure: " . $e->getMessage(), 209);
 		}
 
 		if ($row)
@@ -499,45 +497,4 @@ class Habrometr_Model
 		}
 	}
 
-	/**
-	 * Install DB
-	 *
-	 */
-	public function install()
-	{
-		$sql = <<<_SQL1
-CREATE TABLE `karmalog` (
-`user_id` INT( 6 ) UNSIGNED NOT NULL ,
-`karma_value` FLOAT NOT NULL ,
-`karma_votes` MEDIUMINT( 6 ) NOT NULL ,
-`habraforce` FLOAT NOT NULL ,
-`rate_position` MEDIUMINT( 6 ) NOT NULL ,
-`log_time` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ,
-PRIMARY KEY ( `user_id` , `log_time` ) 
-) ENGINE = MYISAM;
-_SQL1;
-		$r1 = $this->_pdo->exec($sql);
-
-		$sql = <<<_SQL2
-CREATE TABLE `users` (
-`user_id` INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY ,
-`user_code` VARCHAR( 50 ) NOT NULL ,
-`user_email` VARCHAR( 100 ) NOT NULL,
-UNIQUE KEY `user_code` (`user_code`)
-) ENGINE = MYISAM;
-_SQL2;
-		$r2 = $this->_pdo->exec($sql);
-
-		$sql = <<<_SQL3
-INSERT INTO `users` (
-`user_id` ,
-`user_code` ,
-`user_email` 
-)
-VALUES (
-NULL , 'feedbee', 'feedbee@gmail.com'
-);
-_SQL3;
-		$r3 = $this->_pdo->exec($sql);
-	}
 }

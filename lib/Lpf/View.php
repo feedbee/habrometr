@@ -19,7 +19,6 @@
 
 /**
  * Simple MVC view component implementation.
- * TODO: helpers & menu helper
  */
 class Lpf_View
 {

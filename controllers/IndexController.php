@@ -20,7 +20,7 @@ class IndexController
 		}
 		
 		$view = Lpf_Dispatcher::getView();
-		//<p><strong>О Хаброметре</strong> <a href="./users/">Список всех пользователей</a> <a href="./register/">Регистрация</a></p>
+		
 		$view->getHelper('menuView')->setElements(array(
 			'/' => array('url' => './', 'text' => 'О Хаброметре'),
 			'/users' => array('url' => './users/', 'text' => 'Список всех пользователей'),
@@ -32,7 +32,7 @@ class IndexController
 	public function allUsersAction()
 	{
 		$view = Lpf_Dispatcher::getView();
-		$view->userList = Habrometr_Model::getInstance()->getUserList();
+		$view->userList = Habrometr_Model::getInstance()->getUserList('user_id', 'ASC');
 	}
 	
 	public function registerAction()

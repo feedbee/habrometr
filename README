@@ -1,0 +1,145 @@
+Habrometr Source Code.
+
+Version 0.5 beta.
+
+This program collects habrahabr.ru karma, habraforce and habra rate values and
+visualizes it on graphical informers.
+
+The software published under GPL3 License.
+
+ *  Copyright (C) 2009 Leontyev Valera
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ * 
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ * 
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program. If not, see <http://www.gnu.org/licenses/>.
+
+SOFTWARE DEPENDENCIES
+
+1) HTTP-Webserver (possible Apache);
+2) MySQL Database (4.x and heigher);
+3) PHP 5.1 or heigher with Curl and IMagick extensions;
+4) Image Magick libs;
+5) [Optional] nginx, eaccelerator.
+
+INSTALLATION
+
+1) Create new database and user. "Add" user to new database. Exequte SQL from
+./habrometr.sql file.
+
+2) Create pass.php file with the next contents:
+Listing 1. pass.php
+---------------------------------------------------------------------------------
+<?php
+define('DBUSER', 'xxx');
+define('DBPASS', 'yyy');
+define('DBNAME', 'zzz');
+---------------------------------------------------------------------------------
+Replace the xxx, yyy, and zzz with real values.
+
+3) Upload all source code to server. Chmod `cache` directory to 0777.
+
+4) If you don't want to use Memcache (in relation with nginx), comment out
+last if-block in index.php.
+Other way use the next nginx configuration (replace hostnames and ports
+with your values):
+Listing 2. nginx.conf
+---------------------------------------------------------------------------------
+user www-data;
+worker_processes 2;
+
+error_log  /var/log/nginx/error.log;
+pid        /var/run/nginx.pid;
+
+events {
+    worker_connections  2048;
+}
+
+http {
+    include       /etc/nginx/mime.types;
+    default_type  application/octet-stream;
+
+    access_log  /var/log/nginx/access.log;
+
+    sendfile        on;
+
+    keepalive_timeout  65;
+    tcp_nodelay        on;
+
+    gzip  on;
+    add_header Habrometr "hacker_mode_enabled;)";
+
+    server {
+        listen       80;
+        server_name  habrometr.server.valera.ws habrometr.ru www.habrometr.ru;
+
+        access_log  /var/log/nginx/habrometr.access.log;
+
+        location / {
+            root   /home/habrometr/public_html;
+            index  index.html index.htm;
+
+            if (-f $document_root/image_cache${uri}) {
+                rewrite ^.*$ /image_cache/$uri last;
+                break;
+            }
+
+            set $memcached_key "habrometr$uri";
+            memcached_pass localhost:11211;
+            error_page 404 502 504 = @backend;
+            add_header Content-Type "text/html; charset=UTF-8";
+            gzip on;
+            gzip_proxied any;
+            gzip_types application/octet-stream;
+        }
+
+        location @backend {
+            set $proxy_uri http://habrometr.ru:9999$request_uri;
+            proxy_pass $proxy_uri;
+            proxy_redirect off;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X_Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_connect_timeout 20;
+        }
+
+        location /image_cache/ {
+            root   /home/habrometr/public_html;
+            expires modified +2h;
+        }
+
+        location /stuff/ {
+            root   /home/habrometr/public_html;
+            expires 30d;
+        }
+
+        location ~* \.(gif|jpg|jpeg|ico) {
+            root  /home/habrometr/public_html;
+        }
+        
+        error_page   500 502 503 504  /50x.html;
+        location = /50x.html {
+            root   /var/www/nginx-default;
+        }
+
+        location ~ \.php$ {
+            proxy_pass   http://habrometr.ru:9999;
+            proxy_redirect off;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X_Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_connect_timeout 20;
+        }
+
+        location ~ /\.ht {
+            deny  all;
+        }
+    }
+}
+ 
