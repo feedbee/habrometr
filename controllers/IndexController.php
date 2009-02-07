@@ -129,6 +129,9 @@ class IndexController
 		$view->userCode = $user['user_code'];
 	}
 	
+	public function sourceAction()
+	{}
+	
 	public function defaultAction()
 	{
 		Lpf_Dispatcher::getView()->version = Habrometr_Model::VERSION;
