@@ -1,4 +1,4 @@
-<p><a href="./">О Хаброметре</a> <strong>Список всех пользователей</strong> <a href="./register/">Регистрация</a></p>
+<?php echo $this->menuView(null, '/users'); ?>
 <h1>Список всех пользователей Хаброметра</h1>
 <ul>
 <?php

@@ -44,6 +44,7 @@ class Lpf_View
 	public function __construct()
 	{
 		$this->_variables = array();
+		$this->_helpers = array();
 	}
 	
 	/**
@@ -73,6 +74,16 @@ class Lpf_View
 	function __set($name, $value)
 	{
 		$this->_variables[$name] = $value;
+	}
+	
+	public function __call($name, $params)
+	{
+		if (!isset($this->_helpers[$name]))
+		{
+			throw new Exception('Call to undefined helper "'.$name.'"');
+		}
+		
+		return $this->getHelper($name)->$name($params);
 	}
 	
 	/**
@@ -109,8 +120,32 @@ class Lpf_View
 		return null;
 	}
 	
-	public function addHelper()
+	public function addHelper($helperName)
 	{
+		if (isset($this->_helpers[$helperName]))
+		{
+			return null;
+		}
 		
+		$this->_helpers[$helperName] = null;
+		return true;
+	}
+	
+	public function getHelper($helperName)
+	{
+		if (!isset($this->_helpers[$helperName]))
+		{
+			$this->addHelper($helperName);
+		}
+		
+		if (!is_object($this->_helpers[$helperName]))
+		{
+			// someHelper => Lpf_Helper_SomeHelper
+			$helperNameReady = strtoupper(substr($helperName, 0, 1)) . substr($helperName, 1);
+			$helperNameReady = 'Lpf_Helper_' . $helperNameReady;
+			$this->_helpers[$helperName] = new $helperNameReady();
+		}
+		
+		return $this->_helpers[$helperName];
 	}
 }

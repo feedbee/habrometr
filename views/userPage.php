@@ -1,4 +1,4 @@
-<p><a href="./">О Хаброметре</a> <a href="./users/">Список всех пользователей</a> <a href="./register/">Регистрация</a></p>
+<?php echo $this->menuView(); ?>
 <h1>Страница хабраюзера <a href="http://<?php print $this->userData['user_code']; ?>.habrahabr.ru/"><?php print $this->userData['user_code']; ?></a></h1>
 <?php if (!$this->current) { ?>
 <p>Данные по пользователю пока не запрашивались.</p>

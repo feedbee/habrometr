@@ -1,4 +1,4 @@
-<p><a href="./">О Хаброметре</a> <a href="./users/">Список всех пользователей</a> <a href="./register/">Регистрация</a></p>
+<?php echo $this->menuView(); ?>
 <h1>Код Хаброметров пользователя <a href="./users/<?php print $this->userCode; ?>/"><?php print $this->userCode; ?></a></h1>
 <p>Внимание. Код информера изменять <strong>разрешается</strong>. Например, если вы хотите убрать ссылку на Хаброграф, чтобы информер лаконично вписался в ваш сайт, вы <strong>можете</strong> это сделать.</p>
 <?php $s = $this->sizes; foreach($s as $size) { ?>
