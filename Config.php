@@ -31,7 +31,7 @@
 if (!file_exists(dirname(__FILE__) . '/pass.php'))
 	die('Read some comments in config.php!');
 
-require(dirname(__FILE__) . 'pass.php');
+require(dirname(__FILE__) . '/pass.php');
 
 class Config
 {
