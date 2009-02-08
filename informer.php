@@ -17,7 +17,7 @@
  *  along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-set_include_path(realpath('./lib') . PATH_SEPARATOR . get_include_path());
+set_include_path(realpath(dirname(__FILE__) . '/lib') . PATH_SEPARATOR . get_include_path());
 require('Lpf/Loader.php');
 
 Lpf_Loader::loadClass('Lpf_ErrorHandler');
