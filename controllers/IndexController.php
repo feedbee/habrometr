@@ -114,7 +114,7 @@ class IndexController
 		$view = Lpf_Dispatcher::getView();
 		$view->userData = Habrometr_Model::getInstance()->getUser($this->_userId);
 		$view->current = Habrometr_Model::getInstance()->getValues($this->_userId);
-		$view->history = Habrometr_Model::getInstance()->getHistory($this->_userId, 500);
+		$view->history = Habrometr_Model::getInstance()->getHistoryGrouped($this->_userId, 90);
 	}
 	
 	public function getAction()
@@ -123,7 +123,10 @@ class IndexController
 		$view->sizes = array(
 			array('x' => 425, 'y' => 120),
 			array('x' => 88,  'y' => 120),
-			array('x' => 88,  'y' => 15)
+			array('x' => 88,  'y' => 15),
+			array('x' => 88,  'y' => 31),
+			array('x' => 31,  'y' => 31),
+			array('x' => 350,  'y' => 20)
 		);
 		$user = Habrometr_Model::getInstance()->getUser($this->_userId);
 		$view->userCode = $user['user_code'];

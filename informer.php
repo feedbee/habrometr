@@ -59,6 +59,7 @@ else
 
 $className = "Habrometr_Informer_{$width}x{$height}";
 $fileName = "./lib/Habrometr/Informer/{$width}x{$height}.php";
+
 if (file_exists($fileName))
 {
 	require_once($fileName);

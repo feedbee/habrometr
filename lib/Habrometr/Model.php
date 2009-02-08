@@ -25,11 +25,11 @@
  * @link http://habrometr.ru/
  * @copyright 2009, feedbee@gmail.com.
  * @license GNU General Public License (GPL).
- * @version 0.5.1
+ * @version 0.5.2
  */
 class Habrometr_Model
 {
-	const VERSION_FULL = '0.5.1';
+	const VERSION_FULL = '0.5.2';
 	const VERSION = '0.5';
 
 	/**
@@ -131,6 +131,33 @@ class Habrometr_Model
 	{
 		$sth = $this->_pdo->prepare("SELECT karma_value, habraforce, rate_position, DATE_ADD(log_time, INTERVAL 2 HOUR) as log_time
 								FROM `karmalog` where user_id = :uid order by log_time DESC limit :limit");
+		$sth->bindValue(':limit', $count, PDO::PARAM_INT);
+		$sth->bindValue(':uid', $userId, PDO::PARAM_INT);
+		$sth->execute();
+		$rows = $sth->fetchAll(PDO::FETCH_ASSOC);
+		
+		if ($rows)
+		{
+			return $rows;
+		}
+		else
+		{
+			return null;
+		}
+	}
+	
+	/**
+	 * Query to DB to get Habravalues groupped by days.
+	 * Returns array of values array or null in case of failure.
+	 *
+	 * @param int $userId
+	 * @param int $count
+	 * @return array
+	 */
+	public function getHistoryGrouped($userId = 1, $count = 1)
+	{
+		$sth = $this->_pdo->prepare("SELECT avg(karma_value) as karma_value, avg(habraforce) as habraforce, avg(rate_position) as rate_position, DATE(DATE_ADD(log_time, INTERVAL 2 HOUR)) as `date`
+								FROM `karmalog` where user_id = :uid group by `date` order by `date` DESC limit :limit");
 		$sth->bindValue(':limit', $count, PDO::PARAM_INT);
 		$sth->bindValue(':uid', $userId, PDO::PARAM_INT);
 		$sth->execute();

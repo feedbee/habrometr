@@ -18,17 +18,17 @@
  */
 
 /**
- * Habrometr Informer 88x120
+ * Habrometr Informer 350x20
  * 
  * @version 1.0
  * @author feedbee
  * @copyright 2009 feedbee
  *
  */
-class Habrometr_Informer_88x120 extends Habrometr_Informer
+class Habrometr_Informer_350x20 extends Habrometr_Informer
 {
-	const WIDTH = 88;
-	const HEIGHT = 120;
+	const WIDTH = 350;
+	const HEIGHT = 20;
 	
 	private $_karma = null;
 	private $_habraforce = null;
@@ -95,7 +95,6 @@ class Habrometr_Informer_88x120 extends Habrometr_Informer
 		// Draw texts
 		$draw = new ImagickDraw();
 		$draw->setTextUnderColor($color['bg']);
-		$draw->setTextAlignment(Imagick::ALIGN_CENTER);
 		$draw->setTextAntialias(true);
 		$draw->setFillColor($color['text']);
 		$draw->setFont(realpath('stuff/arialbd.ttf'));
@@ -105,31 +104,51 @@ class Habrometr_Informer_88x120 extends Habrometr_Informer
 		{
 			$code = substr($code, 0, 9) . '...';
 		}
-		$draw->annotation(self::WIDTH / 2, self::HEIGHT - 9, $code);
+		$draw->annotation(80, 13, $code);
+		$textInfo = $this->_canvas->queryFontMetrics($draw, $code, null);
+		$nextX = 80 + 9 + $textInfo['textWidth'];
 		
 		$draw->setFont(realpath('stuff/consola.ttf'));
 		$draw->setFontSize(11);
 		$draw->setFillColor($color['neutral']);
-		$draw->annotation(self::WIDTH / 2, 15, "хаброметр");
-		
-		$text = sprintf('%01.2f', $this->_extremums['karma_min']) . ' / ' . sprintf('%01.2f', $this->_extremums['karma_max']);
-		$draw->setFontSize(9);
-		$draw->setFillColor($color['karma']);
-		$draw->annotation(self::WIDTH / 2, 55, $text);
-		
-		$text = sprintf('%01.2f', $this->_extremums['habraforce_min']) . ' / ' . sprintf('%01.2f', $this->_extremums['habraforce_max']);
-		$draw->setFontSize(9);
-		$draw->setFillColor($color['force']);
-		$draw->annotation(self::WIDTH / 2, 95, $text);
+		$draw->annotation(5, 13, "хаброметр");
 		
 		$draw->setTextUnderColor($color['karma']);
 		$draw->setFillColor($color['bg']);
-		$draw->setFontSize(14);
+		$draw->setFontSize(12);
 		$draw->setFont(realpath('stuff/consolab.ttf'));
-		$draw->annotation(self::WIDTH / 2, 35, sprintf('%01.2f', $this->_karma));
+		$draw->annotation($nextX, 13, $text = sprintf('%01.2f', $this->_karma));
+		$textInfo = $this->_canvas->queryFontMetrics($draw, $text, null);
+		$nextX += $textInfo['textWidth'] + 4;
+		
+		$draw->setTextUnderColor($color['bg']);
+		$draw->setFont(realpath('stuff/arialbd.ttf'));
+		$text = sprintf('%01.2f', $this->_extremums['karma_min']) . '/' . sprintf('%01.2f', $this->_extremums['karma_max']);
+		$draw->setFontSize(8);
+		$draw->setFillColor($color['karma']);
+		$draw->annotation($nextX, 13, $text);
+		$textInfo = $this->_canvas->queryFontMetrics($draw, $text, null);
+		$nextX += $textInfo['textWidth'] + 9;
+		
+		$draw->setFontSize(12);
+		$draw->setFont(realpath('stuff/consolab.ttf'));		
 		$draw->setTextUnderColor($color['force']);
 		$draw->setFillColor($color['bg']);
-		$draw->annotation(self::WIDTH / 2, 75, sprintf('%01.2f', $this->_habraforce));
+		$draw->annotation($nextX, 13, $text = sprintf('%01.2f', $this->_habraforce));
+		$textInfo = $this->_canvas->queryFontMetrics($draw, $text, null);
+		$nextX += $textInfo['textWidth'] + 4;
+		
+		$draw->setTextUnderColor($color['bg']);
+		$draw->setFont(realpath('stuff/arialbd.ttf'));
+		$text = sprintf('%01.2f', $this->_extremums['habraforce_min']) . '/' . sprintf('%01.2f', $this->_extremums['habraforce_max']);
+		$draw->setFontSize(8);
+		$draw->setFillColor($color['force']);
+		$draw->annotation($nextX, 13, $text);
+		
+		$image = new Imagick('stuff/bg-user2.gif');
+		$this->_canvas->compositeImage($image, Imagick::COMPOSITE_COPY, 64, 3, Imagick::CHANNEL_ALL);
+		$image->clear();
+		$image->destroy();
 		
 		$this->_canvas->drawImage($draw);
 		$draw->destroy();

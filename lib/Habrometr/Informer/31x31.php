@@ -18,21 +18,20 @@
  */
 
 /**
- * Habrometr Informer 88x120
+ * Habrometr Informer 31x31
  * 
  * @version 1.0
  * @author feedbee
  * @copyright 2009 feedbee
  *
  */
-class Habrometr_Informer_88x120 extends Habrometr_Informer
+class Habrometr_Informer_31x31 extends Habrometr_Informer
 {
-	const WIDTH = 88;
-	const HEIGHT = 120;
+	const WIDTH = 31;
+	const HEIGHT = 31;
 	
 	private $_karma = null;
 	private $_habraforce = null;
-	private $_extremums = null;
 	
 	public function __construct($user, Habrometr_Model $h = null)
 	{
@@ -45,9 +44,6 @@ class Habrometr_Informer_88x120 extends Habrometr_Informer
 		$values = $this->_habrometr->getValues($this->_userId, 20);
 		if (!$values)
 			$this->_showError('History not found');
-		$this->_extremums = $this->_habrometr->getExtremums($this->_userId);
-		if (!$this->_extremums)
-			$this->_showError('Max or min values calculation error');
 		
 		$this->_karma = $values['karma_value'];
 		$this->_habraforce = $values['habraforce'];
@@ -68,14 +64,12 @@ class Habrometr_Informer_88x120 extends Habrometr_Informer
 		$color['bg'] = new ImagickPixel("white");
 		$color['neutral'] = new ImagickPixel("rgb(200, 200, 200)");
 		$color['habr'] = new ImagickPixel("rgb(83, 121, 139)");
+		$color['transparent'] = new ImagickPixel("transparent");
 		
 		// Prepare canvas for drawing main graph
 		$draw = new ImagickDraw();
 		$draw->setStrokeAntialias(true);
 		$draw->setStrokeWidth(2);
-		
-		// Prepare values for drawing main graph
-		define('PADDING', 10);
 		
 		// Draw bottom bg
 		define('TOP_SPACER', 10);
@@ -94,46 +88,23 @@ class Habrometr_Informer_88x120 extends Habrometr_Informer
 		
 		// Draw texts
 		$draw = new ImagickDraw();
-		$draw->setTextUnderColor($color['bg']);
 		$draw->setTextAlignment(Imagick::ALIGN_CENTER);
 		$draw->setTextAntialias(true);
-		$draw->setFillColor($color['text']);
-		$draw->setFont(realpath('stuff/arialbd.ttf'));
-		$code = $this->_user;
-		$draw->setFontSize(strlen($code) > 8 ? 10 : 11);
-		if (strlen($code) > 10)
-		{
-			$code = substr($code, 0, 9) . '...';
-		}
-		$draw->annotation(self::WIDTH / 2, self::HEIGHT - 9, $code);
-		
-		$draw->setFont(realpath('stuff/consola.ttf'));
-		$draw->setFontSize(11);
-		$draw->setFillColor($color['neutral']);
-		$draw->annotation(self::WIDTH / 2, 15, "хаброметр");
-		
-		$text = sprintf('%01.2f', $this->_extremums['karma_min']) . ' / ' . sprintf('%01.2f', $this->_extremums['karma_max']);
-		$draw->setFontSize(9);
-		$draw->setFillColor($color['karma']);
-		$draw->annotation(self::WIDTH / 2, 55, $text);
-		
-		$text = sprintf('%01.2f', $this->_extremums['habraforce_min']) . ' / ' . sprintf('%01.2f', $this->_extremums['habraforce_max']);
-		$draw->setFontSize(9);
-		$draw->setFillColor($color['force']);
-		$draw->annotation(self::WIDTH / 2, 95, $text);
-		
 		$draw->setTextUnderColor($color['karma']);
 		$draw->setFillColor($color['bg']);
-		$draw->setFontSize(14);
+		$draw->setFontSize(9 - 1 * ($this->_karma > 99 || $this->_habraforce > 99));
 		$draw->setFont(realpath('stuff/consolab.ttf'));
-		$draw->annotation(self::WIDTH / 2, 35, sprintf('%01.2f', $this->_karma));
+		$draw->annotation(self::WIDTH / 2, 10, sprintf('%01.2f', $this->_karma));
 		$draw->setTextUnderColor($color['force']);
 		$draw->setFillColor($color['bg']);
-		$draw->annotation(self::WIDTH / 2, 75, sprintf('%01.2f', $this->_habraforce));
+		$draw->annotation(self::WIDTH / 2, 23, sprintf('%01.2f', $this->_habraforce));
 		
 		$this->_canvas->drawImage($draw);
 		$draw->destroy();
 		
 		return true;
 	}
+	
+	public function saveToCache()
+	{}
 }

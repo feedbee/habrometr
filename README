@@ -45,7 +45,7 @@ define('DBNAME', 'zzz');
 ---------------------------------------------------------------------------------
 Replace the xxx, yyy, and zzz with real values.
 
-3) Upload all source code to server. Chmod `cache` directory to 0777.
+3) Upload all source code to server. Chmod `image_cache` directory to 0777.
 
 4) If you don't want to use Memcache (in relation with nginx), comment out
 last if-block in index.php.

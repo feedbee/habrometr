@@ -13,7 +13,9 @@
 
 <p><a href="./users/<?php print $this->userData['user_code']; ?>/get/">Коды Хаброметров пользователя</a></p>
 
-<h2>История хабразначений (последние 500 записей)</h2>
+<p><img src="./habrometr_425x120_<?php print $this->userData['user_code']; ?>.png" width="425" height="120" alt="Хаброметр <?php print $this->userData['user_code']; ?>" title="Хаброметр <?php print $this->userData['user_code']; ?>" /></p>
+
+<h2>История хабразначений <?php print $this->userData['user_code']; ?>  за последние 90 дней<br />(отображается среднее значение показателей за сутки)</h2>
 <?php if (!$this->history) { ?>
 <p>История пуста.</p>
 <?php } else { ?>
@@ -25,7 +27,10 @@
 		<th>Дата</th>
 	</tr>
 	<?php $h = $this->history; foreach($h as $row) { 
-		print "\t<tr>\r\n\t\t<td>{$row['karma_value']}</td>\r\n\t\t<td>{$row['habraforce']}</td>\r\n\t\t<td>{$row['rate_position']}</td>\r\n\t\t<td>{$row['log_time']}</td>\r\n\t<tr>\r\n";
+		print "\t<tr>\r\n\t\t<td>" . round($row['karma_value'], 2)
+			. "</td>\r\n\t\t<td>" . round($row['habraforce'], 2)
+			. "</td>\r\n\t\t<td>" . round($row['rate_position'], 2)
+			. "</td>\r\n\t\t<td>{$row['date']}</td>\r\n\t<tr>\r\n";
 	} ?>
 </table>
 <?php } ?>
