@@ -328,23 +328,23 @@ class Habrometr_Model
 		{
 			if (!in_array($orderField, array('user_id', 'user_code', 'user_email')))
 			{
-				throw new Exception('Habrakarma::getUserList: orderField must be one of: user_id, user_code, user_email', 210);
+				throw new Exception('Habrometr_Model::getUserList: orderField must be one of: user_id, user_code, user_email', 210);
 			}
 			$sql .= ' ORDER BY ' . $orderField;
 		}
-		if (!is_null($orderField) && !is_null($orderBy) )
+		if (!is_null($orderField) && !is_null($orderType) )
 		{
-			if (!in_array(strtoupper($orderBy), array('DESC', 'ASC')))
+			if (!in_array(strtoupper($orderType), array('DESC', 'ASC')))
 			{
-				throw new Exception('Habrakarma::getUserList: orderType must be DESC or ASC', 210);
+				throw new Exception('Habrometr_Model::getUserList: orderType must be DESC or ASC', 210);
 			}
-			$sql .= ' ' . strtoupper($orderBy);
+			$sql .= ' ' . strtoupper($orderType);
 		}
 		if (!is_null($from))
 		{
 			if (!ctype_digit((string)$from) || $from < 0)
 			{
-				throw new Exception('Habrakarma::getUserList: from field must be an integer geather than or equal 0', 210);
+				throw new Exception('Habrometr_Model::getUserList: from field must be an integer geather than or equal 0', 210);
 			}
 			$sql .= ' LIMIT ' . $from;
 		}
@@ -352,7 +352,7 @@ class Habrometr_Model
 		{
 			if (!ctype_digit((string)$from) || $count <= 0)
 			{
-				throw new Exception('Habrakarma::getUserList: count field must be an integer geather than 0', 210);
+				throw new Exception('Habrometr_Model::getUserList: count field must be an integer geather than 0', 210);
 			}
 			$sql .= ', ' . $count;
 		}

@@ -36,8 +36,10 @@ class Lpf_Helper_MenuView
 	 */
 	public function menuView($params = null)
 	{
-		$elements = is_null($params[0]) ? $this->_elements : $params[0];
-		$active = is_null($params[1]) ? $this->_activeElement : $params[1];
+		$elements = isset($params[0]) && !is_null($params[0]) ?
+			$params[0] : $this->_elements;
+		$active = isset($params[1]) && !is_null($params[1]) ?
+			$params[1] : $this->_activeElement;
 		
 		$view = new Lpf_View();
 		$view->elements = $elements;
