@@ -17,6 +17,8 @@
  *  along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+$timeStart = microtime(true);
+
 set_include_path(dirname(__FILE__) . PATH_SEPARATOR . 
 	realpath(dirname(__FILE__) . '/lib') . PATH_SEPARATOR . get_include_path());
 require('Lpf/Loader.php');
@@ -93,3 +95,7 @@ if (!$informer->build())
 $informer->printCanvas();
 $informer->saveToCache();
 $informer->destroyCanvas();
+
+$timeFull = microtime(true) - $timeStart;
+file_put_contents(dirname(__FILE__) . '/../generation_log.txt',
+	"{$_SERVER['REQUEST_URI']}\t{$timeFull}\t" . date('Y-m-d H:i:s') . "\n", FILE_APPEND);
