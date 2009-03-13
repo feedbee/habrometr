@@ -10,7 +10,7 @@ CREATE TABLE `karmalog` (
 CREATE TABLE `users` (
   `user_id` int(10) unsigned NOT NULL auto_increment,
   `user_code` varchar(50) NOT NULL,
-  `user_email` varchar(100) NOT NULL,
+  `user_email` varchar(100) NULL,
   PRIMARY KEY  (`user_id`),
   UNIQUE KEY `user_code` (`user_code`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=104 ;
