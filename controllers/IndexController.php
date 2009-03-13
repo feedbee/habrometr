@@ -98,6 +98,10 @@ class IndexController
 					$m = new Lpf_Memcache('habrometr');
 					$m->delete('/users/');
 				}
+				else
+				{
+					$errors[] = "Ошибка регистрации";
+				}
 			}
 		}
 		
