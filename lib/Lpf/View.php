@@ -108,8 +108,15 @@ class Lpf_View
 		if ($return)
 		{
 			ob_start();
-			require_once($filename);
-			$c = ob_get_clean();
+			try
+			{
+				require_once($filename);
+				$c = ob_get_clean();
+			}
+			catch (Exception $e)
+			{
+				$c = ob_get_clean() . $e->getMessage();
+			}
 			return $c;
 		}
 		else

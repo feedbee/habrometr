@@ -13,4 +13,4 @@ CREATE TABLE `users` (
   `user_email` varchar(100) NULL,
   PRIMARY KEY  (`user_id`),
   UNIQUE KEY `user_code` (`user_code`)
-) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=104 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=1;

@@ -11,7 +11,7 @@ class IndexController
 		{
 			$this->_userCode = $_GET['user'];
 			if (!($this->_userId = (int)(Habrometr_Model::getInstance()->code2UserId($this->_userCode))))
-				throw new Exception('Error: user not found.');
+				throw new Exception('Error: user not found.', 404);
 		}
 		else
 		{
@@ -47,12 +47,12 @@ class IndexController
 			$user_code = trim($_GET['user_code']);
 			if (!preg_match('#[a-zA-Z0-9\-_]{1,100}#', $user_code))
 			{
-				$errors[] = 'Логин пользователя должен состоять из символов латинского алфавита, цифр и символов "-", "_".';
+				$errors[] = 'Хабралогин пользователя должен состоять из символов латинского алфавита, цифр и символов "-", "_".';
 			}
 			if (isset($_GET['user_email']) && $_GET['user_email'] !== '')
 			{
 				$user_email = trim($_GET['user_email']);
-				if (!preg_match("/[0-9a-z_]+@[0-9a-z_^\.-]+\.[a-z]{2,4}/i", $user_email))
+				if (!preg_match("/[0-9A-Za-z_\.]+@[0-9A-Za-z_^\.-]+\.[a-z]{2,4}/i", $user_email))
 				{
 					$errors[] = 'E-mail пользователя должен соответствовать шаблону "user@host.zone".';
 				}
@@ -86,7 +86,8 @@ class IndexController
 			// Ошибок нет, надо регить юезра
 			if (!$errors)
 			{
-				if ($userId = Habrometr_Model::getInstance()->addUser(array('user_code' => $user_code, 'user_email' => $user_email)))
+				if (false != ($userId = Habrometr_Model::getInstance()
+					->addUser(array('user_code' => $user_code, 'user_email' => $user_email))))
 				{
 					$ok = true;
 					try

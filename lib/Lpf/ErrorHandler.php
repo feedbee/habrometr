@@ -31,14 +31,22 @@ class Lpf_ErrorHandler
 	static public function exceptionHandler($exception)
 	{
 		error_log("Unhandled exception: Code {$exception->getCode()}; Message: {$exception->getMessage()}");
-		if (defined('DEBUG'))
+		if (defined('DEBUG') && DEBUG == true)
 		{
 			die("Unhandled exception: Code {$exception->getCode()}; Message: {$exception->getMessage()}");
 		}
 		else
 		{
-			header("HTTP/1.0 500 Internal Server Error", true, 500);
-			die('Error 500: Internal Server Error');
+			if ($exception->getCode() == 404)
+			{
+				header("HTTP/1.0 404 Not Found", true, 404);
+				die('<p align=center><font size=6>Error 404: Page Not Found</font></p>');
+			}
+			else
+			{
+				header("HTTP/1.0 500 Internal Server Error", true, 500);
+				die('<p align=center><font size=6>Error 500: Internal Server Error</font></p>');
+			}
 		}
 	}	
 }

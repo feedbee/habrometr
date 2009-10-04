@@ -17,10 +17,12 @@
  *  along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+session_start();
+
 set_include_path(dirname(__FILE__) . PATH_SEPARATOR . 
 	realpath(dirname(__FILE__) . '/lib') . PATH_SEPARATOR . get_include_path());
 require('Lpf/Loader.php');
-
+define('DEBUG', true);
 Lpf_Loader::loadClass('Lpf_ErrorHandler');
 set_exception_handler(array('Lpf_ErrorHandler', 'exceptionHandler'));
 Lpf_Loader::registerAutoload();
@@ -30,15 +32,32 @@ if (isset($_GET['action']))
 {
 	$action = $_GET['action'];
 	$actionProcessed = strtolower($action);
-	while ($pos = strpos($actionProcessed, '_'))
+	while (false !== ($pos = strpos($actionProcessed, '_')) || false !== ($pos = strpos($actionProcessed, '-')))
 	{
-		$actionProcessed = substr($actionProcessed, 0, $pos) . strtoupper(substr($actionProcessed, $pos+1, 1)) . substr($actionProcessed, $pos + 2);
+		$actionProcessed = substr($actionProcessed, 0, $pos)
+			  . strtoupper(substr($actionProcessed, $pos + 1, 1)) . substr($actionProcessed, $pos + 2);
 	}
 }
 else
 {
 	$action = null;
 	$actionProcessed = 'default';
+}
+if (isset($_GET['controller']))
+{
+	$controller = $_GET['controller'];
+	$controllerProcessed = strtolower($controller);
+	while (false !== ($pos = strpos($actionProcessed, '_')) || false !== ($pos = strpos($controllerProcessed, '-')))
+	{
+		$actionProcessed = substr($actionProcessed, 0, $pos)
+			  . strtoupper(substr($actionProcessed, $pos + 1, 1)) . substr($actionProcessed, $pos + 2);
+	}
+	$controllerProcessed = strtoupper(substr($controller, 0, 1)) . substr($controller, 1);
+}
+else
+{
+	$controller = null;
+	$controllerProcessed = 'Index';
 }
 
 // Dispatch

@@ -30,6 +30,21 @@ class Lpf_Dispatcher
 	static private $_viewInstance = null;
 	
 	/**
+	 * Option to disable default templates rendering.
+	 * 
+	 * @var bool
+	 */
+	static private $_noRender = false;
+	
+	/**
+	 * The path to view script, that will be default-rendered
+	 * for action
+	 * 
+	 * @var string
+	 */
+	static private $_viewScript = '';
+	
+	/**
 	 * Dispatches given action. Executes controllers action and render it's view.
 	 *
 	 * TODO: 
@@ -51,30 +66,39 @@ class Lpf_Dispatcher
 		
 		if (!preg_match('#[a-zA-Z0-9\-_]{1,100}#', $action))
 		{
-			throw new Exception("Action name '{$action}' include bad characters");
+			throw new Exception("Action name '{$action}' include bad characters", 404);
 		}
 		
-		require_once("./controllers/{$controller}Controller.php"); // only one controller presents at this time
+		if (!file_exists("./controllers/{$controller}Controller.php"))
+		{
+			throw new Exception("Controller '{$controller}' not found", 404);
+		}
+		
+		require_once("./controllers/{$controller}Controller.php");
 		if (!class_exists($controller . 'Controller'))
 		{
-			throw new Exception("Controller class {$controller}Controller was not found");
+			throw new Exception("Controller class {$controller}Controller was not found", 404);
 		}
 		
 		$className = $controller . 'Controller';
 		$controllerInstance = new $className();
 		if (!method_exists($controllerInstance, $action . 'Action'))
 		{
-			throw new Exception("Action {$action}Action was not found in controller {$controller}Controller");
+			throw new Exception("Action {$action}Action was not found in controller {$controller}Controller", 404);
 		}
 		
+		self::setViewScript(strtolower($controller) . '/' . $action);
 		$controllerInstance->{$action . 'Action'}();
 		
-		$body = self::getView()->render($action);
-		
-		$page = new Lpf_View();
-		$page->body = $body;
-		$page->title = 'Хаброметр';
-		$page->render('page', false);
+		if (true != self::$_noRender)
+		{
+			$body = self::getView()->render(self::getViewScript());
+			
+			$page = new Lpf_View();
+			$page->body = $body;
+			$page->title = Config::SERVICE_NAME;
+			$page->render('page', false);
+		}
 	}
 	
 	/**
@@ -90,5 +114,25 @@ class Lpf_Dispatcher
 		}
 		
 		return self::$_viewInstance;
+	}
+	
+	static public function getNoRender()
+	{
+		return self::$_noRender;
+	}
+	
+	static public function setNoRender($noRender)
+	{
+		self::$_noRender = $noRender;
+	}
+	
+	static public function getViewScript()
+	{
+		return self::$_viewScript;
+	}
+	
+	static public function setViewScript($path)
+	{
+		self::$_viewScript = $path;
 	}
 }

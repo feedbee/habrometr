@@ -4,7 +4,7 @@
 <head>
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<title><?php print $this->title; ?></title>
-	<base href="<?php print Config::SERVICE_URL; ?>">
+	<base href="<?php print Config::SERVICE_URL; ?>/" />
 	<link rel="stylesheet" href="./stuff/styles.css" media="all" />
 </head>
 <body>
