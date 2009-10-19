@@ -32,6 +32,14 @@ if (isset($_SERVER['REQUEST_METHOD']))
 	die('Forbidden');
 }
 
+isset($argv)
+	&& isset($argv[1])
+	&& ($argv[1] == '-q' || $argv[1] == '--quet')
+	&& $quet = true
+	|| $quet = false;
+
+!$quet && print "=== Update process started ===\r\n";
+
 $h = Habrometr_Model::getInstance();
 $users = $h->getUserList();
 $errorCounter = 0;
@@ -44,13 +52,15 @@ foreach ($users as $key => $user)
 	catch (Exception $e)
 	{
 		$errorCounter++;
-		echo "Error updating user #$key";
+		!$quet && print "Error updating user #$key";
 		if ($errorCounter > 30)
 			break;
 	}
-	echo ".";
+	!$quet && print "." . (($key+1) % 50 == 0 ? "\r\n" : '');
 }
 
-echo "\r\nUsers updated: $key";
+!$quet && print "\r\nUsers updated: " . ($key+1) . "\r\n";
 
 system('rm -f ' . dirname(__FILE__) . '/image_cache/*');
+
+!$quet && print "=== Update process finished ===\r\n";
