@@ -233,7 +233,11 @@ class Habrometr_Model
 		);
 		try
 		{
-			$sth = $this->_pdo->prepare("INSERT `karmalog` (user_id, karma_value, habraforce, rate_position) VALUES (?, ?, ?, ?)");
+			$sth = $this->_pdo->prepare("INSERT `karmalog` (user_id, karma_value, habraforce, rate_position) VALUES (:uid, :k, :hf, :r)");
+			$sth->bindValue(':uid', $values['user_id']);
+			$sth->bindValue(':k', $values['karma_value']);
+			$sth->bindValue(':hf', $values['habraforce']);
+			$sth->bindValue(':r', $values['rate_position']);
 			if (!$sth->execute())
 			{
 				throw new Exception('User addition — DB query failed: ' . $this->_pdo->errorInfo(), $this->_pdo->errorCode());

@@ -35,7 +35,7 @@ if (isset($_SERVER['REQUEST_METHOD']))
 $h = Habrometr_Model::getInstance();
 $users = $h->getUserList();
 $errorCounter = 0;
-foreach ($users as $user)
+foreach ($users as $key => $user)
 {
 	try
 	{
@@ -44,9 +44,13 @@ foreach ($users as $user)
 	catch (Exception $e)
 	{
 		$errorCounter++;
+		echo "Error updating user #$key";
 		if ($errorCounter > 30)
 			break;
 	}
+	echo ".";
 }
+
+echo "\r\nUsers updated: $key";
 
 system('rm -f ' . dirname(__FILE__) . '/image_cache/*');
