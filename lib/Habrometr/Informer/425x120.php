@@ -112,12 +112,17 @@ class Habrometr_Informer_425x120 extends Habrometr_Informer
 		$lastX = LEFT_PAD;
 		$lastY = $karma[0];
 		$graph['cords'] = array();
+
 		foreach($karma as $y)
 		{
-			$graph['cords'][] = array('x' => (float)$lastX, 'y' => $graph['b'] - round($y - $this->_min_karma) * $graph['k']);
+			if ($dataHeight != 0)
+				$graph['cords'][] = array('x' => (float)$lastX, 'y' => $graph['b'] - round($y - $this->_min_karma) * $graph['k']);
+			else
+				$graph['cords'][] = array('x' => (float)$lastX, 'y' => $graph['t'] + round($graph['height'] / 2) );
+
 			$lastX += $graph['segmentWidth'];
 		}
-		
+
 		//Draw graph
 		$draw->polyline($graph['cords']);
 		$this->_canvas->drawImage($draw);
