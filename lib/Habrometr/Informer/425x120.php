@@ -35,6 +35,8 @@ class Habrometr_Informer_425x120 extends Habrometr_Informer
 	private $_extremums = null;
 	private $_min_karma = null;
 	private $_max_karma = null;
+	private $_min_habraforce = null;
+	private $_max_habraforce = null;
 	private $_log_time = null;
 	
 	public function __construct($user, Habrometr_Model $h = null)
@@ -56,6 +58,7 @@ class Habrometr_Informer_425x120 extends Habrometr_Informer
 	
 		$this->_karma = array();
 		$this->_min_karma = $this->_max_karma = null;
+
 		foreach($this->_data as $row)
 		{
 			$this->_karma[] = $row['karma_value'];
@@ -63,8 +66,13 @@ class Habrometr_Informer_425x120 extends Habrometr_Informer
 				$this->_min_karma = $row['karma_value'];
 			if (is_null($this->_max_karma) || $row['karma_value'] > $this->_max_karma)
 				$this->_max_karma = $row['karma_value'];
+
+			$this->_habraforce[] = $row['habraforce'];
+			if (is_null($this->_min_habraforce) || $row['habraforce'] < $this->_min_habraforce)
+				$this->_min_habraforce = $row['habraforce'];
+			if (is_null($this->_max_habraforce) || $row['habraforce'] > $this->_max_habraforce)
+				$this->_max_habraforce = $row['habraforce'];
 		}
-		$this->_habraforce = $this->_data[0]['habraforce'];
 		$this->_logTime = $this->_data[0]['log_time'];
 		
 		return true;
@@ -75,7 +83,8 @@ class Habrometr_Informer_425x120 extends Habrometr_Informer
 		// Prepage image
 		$this->_canvas = new Imagick();
 		$this->_canvas->newImage(self::WIDTH, self::HEIGHT, new ImagickPixel("white"));
-		$color['line'] = new ImagickPixel("rgb(216, 76, 64)");
+		$color['karmaline'] = new ImagickPixel("rgb(216, 76, 64)");
+		$color['forceline'] = new ImagickPixel("rgb(36, 58, 255)");
 		$color['text'] = new ImagickPixel("rgb(16, 35, 132)");
 		$color['karma'] = new ImagickPixel("rgb(116, 194, 98)");
 		$color['force'] = new ImagickPixel("rgb(37, 168, 255)");
@@ -83,50 +92,50 @@ class Habrometr_Informer_425x120 extends Habrometr_Informer
 		$color['bg'] = new ImagickPixel("white");
 		$color['neutral'] = new ImagickPixel("rgb(200, 200, 200)");
 		
-		// Prepare canvas for drawing main graph
-		$draw = new ImagickDraw();
-		$draw->setStrokeColor($color['line']);
-		$draw->setFillColor($color['bg']);
-		$draw->setStrokeAntialias(true);
-		$draw->setStrokeWidth(2);
-		
 		// Prepare values for drawing main graph
 		define('BOTTOM_PAD', 30);
 		define('TOP_PAD', 25);
 		define('LEFT_PAD', 43);
-		define('RIGHT_PAD', 15);
+		define('RIGHT_PAD', 55);
+		define('LINE_OFFSET', 0);
+
 		$graph = array(
 			'b' => self::HEIGHT - BOTTOM_PAD,
-			't' => TOP_PAD
+			't' => TOP_PAD,
+			'height' => self::HEIGHT - BOTTOM_PAD - TOP_PAD
 		);
-		
-		$graph['height'] = $graph['b'] - $graph['t'];
-		$dataHeight = $this->_max_karma - $this->_min_karma;
-		if ($dataHeight != 0)
-			$graph['k'] = $graph['height'] / $dataHeight;
-		else
-			$graph['k'] = 1;
-			
+
 		$karma = array_reverse($this->_karma);
-		$graph['segmentWidth'] = (self::WIDTH - LEFT_PAD - RIGHT_PAD) / (count($karma) - 1);
-		$lastX = LEFT_PAD;
-		$lastY = $karma[0];
-		$graph['cords'] = array();
+		$habraforce = array_reverse($this->_habraforce);
 
-		foreach($karma as $y)
-		{
-			if ($dataHeight != 0)
-				$graph['cords'][] = array('x' => (float)$lastX, 'y' => $graph['b'] - round($y - $this->_min_karma) * $graph['k']);
-			else
-				$graph['cords'][] = array('x' => (float)$lastX, 'y' => $graph['t'] + round($graph['height'] / 2) );
+		// Drawing habraforce graph (first because might be under karma line)
+		$draw = new ImagickDraw();
+		$draw->setStrokeColor($color['forceline']);
+		$draw->setFillColor($color['bg']);
+		$draw->setFillOpacity (0);
+		$draw->setStrokeOpacity(0.7);
+		$draw->setStrokeAntialias(true);
+		$draw->setStrokeWidth(2);
 
-			$lastX += $graph['segmentWidth'];
-		}
-
-		//Draw graph
-		$draw->polyline($graph['cords']);
+		$force_cords = $this->generateGraphCords($graph, $habraforce, $this->_min_habraforce, $this->_max_habraforce, true);
+		$draw->polyline($force_cords);
 		$this->_canvas->drawImage($draw);
+		$draw->destroy();
 		
+		// Drawing karma graph
+		$draw = new ImagickDraw();
+		$draw->setStrokeColor($color['karmaline']);
+		$draw->setFillColor($color['bg']);
+		$draw->setFillOpacity (0);
+		$draw->setStrokeOpacity(0.7);
+		$draw->setStrokeAntialias(true);
+		$draw->setStrokeWidth(2);
+		
+		$karma_cords = $this->generateGraphCords($graph, $karma, $this->_min_karma, $this->_max_karma, false);
+		$draw->polyline($karma_cords);
+		$this->_canvas->drawImage($draw);
+		$draw->destroy();
+
 		// Draw bottom bg
 		define('TOP_SPACER', 10);
 		$draw = new ImagickDraw();
@@ -161,14 +170,25 @@ class Habrometr_Informer_425x120 extends Habrometr_Informer
 		
 		$this->_canvas->drawImage($draw);
 		$draw->destroy();
+	
+		// Print min/max karma left from graph, min/max habraforce right frm graph and log time
 		$draw = new ImagickDraw();
-		
+
+		// Min/max karma
 		$draw->setFontSize(10);
 		$draw->setFillColor($color['karma']);
 		$draw->setFont(realpath('stuff/consola.ttf'));
 		$draw->annotation(2, $graph['t'] + 5, sprintf('%01.2f', $this->_max_karma));
 		$draw->annotation(2, $graph['b'] + 2, sprintf('%01.2f', $this->_min_karma));
 		
+		// Min/max habraforce
+		$draw->setFontSize(10);
+		$draw->setFillColor($color['force']);
+		$draw->setFont(realpath('stuff/consola.ttf'));
+		$draw->annotation(self::WIDTH - RIGHT_PAD + 5, $graph['t'] + 5, sprintf('%01.2f', $this->_max_habraforce));
+		$draw->annotation(self::WIDTH - RIGHT_PAD + 5, $graph['b'] + 2, sprintf('%01.2f', $this->_min_habraforce));
+		
+		// Log time
 		$draw->setFontSize(10);
 		$draw->setFillColor($color['neutral']);
 		$draw->setFont(realpath('stuff/consola.ttf'));
@@ -178,8 +198,8 @@ class Habrometr_Informer_425x120 extends Habrometr_Informer
 		
 		$this->_canvas->drawImage($draw);
 		$draw->destroy();
+
 		$draw = new ImagickDraw();
-		
 		$draw->setFillColor($color['karma']);
 		$text = 'min/max: ' . sprintf('%01.2f', $this->_extremums['karma_min']) . ' / ' . sprintf('%01.2f', $this->_extremums['karma_max']);
 		$draw->setFontSize(12);
@@ -191,9 +211,9 @@ class Habrometr_Informer_425x120 extends Habrometr_Informer
 		
 		$this->_canvas->drawImage($draw);
 		$draw->destroy();
+
 		$draw = new ImagickDraw();
 		$draw->setTextAlignment(Imagick::ALIGN_RIGHT);
-		
 		$text = 'min/max: ' . sprintf('%01.2f', $this->_extremums['habraforce_min']) . ' / ' . sprintf('%01.2f', $this->_extremums['habraforce_max']);
 		$draw->setFontSize(12);
 		$draw->setFont(realpath('stuff/consola.ttf'));
@@ -204,18 +224,19 @@ class Habrometr_Informer_425x120 extends Habrometr_Informer
 		
 		$this->_canvas->drawImage($draw);
 		$draw->destroy();
+
+		// Karma and force placeholders on right top corner
 		$draw = new ImagickDraw();
 		$draw->setTextAlignment(Imagick::ALIGN_RIGHT);
-		
 		$draw->setTextUnderColor($color['karma']);
 		$draw->setFillColor($color['bg']);
 		$draw->setFontSize(14);
 		$draw->setFont(realpath('stuff/consolab.ttf'));
-		$textInfo = $this->_canvas->queryFontMetrics($draw, sprintf('%01.2f', $this->_habraforce), null);
-		$draw->annotation($lastX - $graph['segmentWidth'] + 1 - $textInfo['textWidth'] - 10, 13, sprintf('%01.2f', $karma[count($karma) - 1]));
+		$textInfo = $this->_canvas->queryFontMetrics($draw, sprintf('%01.2f', $habraforce[count($habraforce) - 1]), null);
+		$draw->annotation(self::WIDTH - 15 + 1 - $textInfo['textWidth'] - 10,  13, sprintf('%01.2f', $karma[count($karma) - 1]));
 		$draw->setTextUnderColor($color['force']);
 		$draw->setFillColor($color['bg']);
-		$draw->annotation($lastX - $graph['segmentWidth'] + 1, 13, sprintf('%01.2f', $this->_habraforce));
+		$draw->annotation(self::WIDTH - 15 + 1, 13, sprintf('%01.2f', $habraforce[count($habraforce) - 1]));
 		
 		$this->_canvas->drawImage($draw);
 		$draw->destroy();
@@ -226,5 +247,31 @@ class Habrometr_Informer_425x120 extends Habrometr_Informer
 		$image->destroy();
 		
 		return true;
+	}
+
+	protected function generateGraphCords(array $graph, array $data, $dataMin, $dataMax, $lineOffset = false)
+	{
+		$dataHeight = $dataMax - $dataMin; 
+		if ($dataHeight != 0)
+			$coefficient = $graph['height'] / $dataHeight;
+		else
+			$coefficient = 1;
+			
+		$segmentWidth = (self::WIDTH - LEFT_PAD - RIGHT_PAD) / (count($data) - 1);
+		$lastX = LEFT_PAD;
+		$lastY = $data[0];
+		$cords = array();
+ 
+		foreach($data as $y)
+		{
+			if ($dataHeight != 0)
+				$cords[] = array('x' => (float)$lastX, 'y' => $graph['b'] - round($y - $dataMin) * $coefficient - ($lineOffset ? LINE_OFFSET : 0));
+			else
+				$cords[] = array('x' => (float)$lastX, 'y' => $graph['b'] - round($graph['height'] / 2)  - ($lineOffset ? LINE_OFFSET : 0));
+
+			$lastX += $segmentWidth;
+		}
+
+		return $cords;
 	}
 }
