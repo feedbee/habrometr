@@ -112,8 +112,9 @@ class Habrometr_Informer_425x120 extends Habrometr_Informer
 		$draw = new ImagickDraw();
 		$draw->setStrokeColor($color['forceline']);
 		$draw->setFillColor($color['bg']);
+		$draw->setFillAlpha(0);
 		$draw->setFillOpacity (0);
-		$draw->setStrokeOpacity(0.7);
+		$draw->setStrokeOpacity(0.5);
 		$draw->setStrokeAntialias(true);
 		$draw->setStrokeWidth(2);
 
@@ -126,8 +127,9 @@ class Habrometr_Informer_425x120 extends Habrometr_Informer
 		$draw = new ImagickDraw();
 		$draw->setStrokeColor($color['karmaline']);
 		$draw->setFillColor($color['bg']);
+		$draw->setFillAlpha(0);
 		$draw->setFillOpacity (0);
-		$draw->setStrokeOpacity(0.7);
+		$draw->setStrokeOpacity(0.5);
 		$draw->setStrokeAntialias(true);
 		$draw->setStrokeWidth(2);
 		
