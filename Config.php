@@ -39,6 +39,6 @@ class Config
 	const DB_PASS = DBPASS;
 	const DB_NAME = DBNAME;
 	
-	const SERVICE_URL = 'http://localhost/habrometr';//http://habrometr.ru
+	const SERVICE_URL = 'http://habrometr.ru';
 	const SERVICE_NAME = 'Хаброметр';
 }
