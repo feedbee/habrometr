@@ -94,7 +94,7 @@ class Habrometr_Informer_425x120 extends Habrometr_Informer
 		
 		// Prepare values for drawing main graph
 		define('BOTTOM_PAD', 30);
-		define('TOP_PAD', 25);
+		define('TOP_PAD', 27);
 		define('LEFT_PAD', 43);
 		define('RIGHT_PAD', 55);
 		define('LINE_OFFSET', 0);
@@ -118,7 +118,7 @@ class Habrometr_Informer_425x120 extends Habrometr_Informer
 		$draw->setStrokeAntialias(true);
 		$draw->setStrokeWidth(2);
 
-		$force_cords = $this->generateGraphCords($graph, $habraforce, $this->_min_habraforce, $this->_max_habraforce, true);
+		$force_cords = $this->generateGraphCords($graph, $habraforce, true);
 		$draw->polyline($force_cords);
 		$this->_canvas->drawImage($draw);
 		$draw->destroy();
@@ -133,7 +133,7 @@ class Habrometr_Informer_425x120 extends Habrometr_Informer
 		$draw->setStrokeAntialias(true);
 		$draw->setStrokeWidth(2);
 		
-		$karma_cords = $this->generateGraphCords($graph, $karma, $this->_min_karma, $this->_max_karma, false);
+		$karma_cords = $this->generateGraphCords($graph, $karma, false);
 		$draw->polyline($karma_cords);
 		$this->_canvas->drawImage($draw);
 		$draw->destroy();
@@ -180,14 +180,14 @@ class Habrometr_Informer_425x120 extends Habrometr_Informer
 		$draw->setFontSize(10);
 		$draw->setFillColor($color['karma']);
 		$draw->setFont(realpath('stuff/consola.ttf'));
-		$draw->annotation(2, $graph['t'] + 5, sprintf('%01.2f', $this->_max_karma));
+		$draw->annotation(2, $graph['t'] + 1, sprintf('%01.2f', $this->_max_karma));
 		$draw->annotation(2, $graph['b'] + 2, sprintf('%01.2f', $this->_min_karma));
 		
 		// Min/max habraforce
 		$draw->setFontSize(10);
 		$draw->setFillColor($color['force']);
 		$draw->setFont(realpath('stuff/consola.ttf'));
-		$draw->annotation(self::WIDTH - RIGHT_PAD + 5, $graph['t'] + 5, sprintf('%01.2f', $this->_max_habraforce));
+		$draw->annotation(self::WIDTH - RIGHT_PAD + 5, $graph['t'] + 1, sprintf('%01.2f', $this->_max_habraforce));
 		$draw->annotation(self::WIDTH - RIGHT_PAD + 5, $graph['b'] + 2, sprintf('%01.2f', $this->_min_habraforce));
 		
 		// Log time
@@ -251,14 +251,17 @@ class Habrometr_Informer_425x120 extends Habrometr_Informer
 		return true;
 	}
 
-	protected function generateGraphCords(array $graph, array $data, $dataMin, $dataMax, $lineOffset = false)
+	protected function generateGraphCords(array $graph, array $data, $lineOffset = false)
 	{
+		$dataMax = max($this->_max_karma, $this->_max_habraforce);
+		$dataMin = min($this->_min_karma, $this->_min_habraforce);
+		 
 		$dataHeight = $dataMax - $dataMin; 
 		if ($dataHeight != 0)
 			$coefficient = $graph['height'] / $dataHeight;
 		else
 			$coefficient = 1;
-			
+		
 		$segmentWidth = (self::WIDTH - LEFT_PAD - RIGHT_PAD) / (count($data) - 1);
 		$lastX = LEFT_PAD;
 		$lastY = $data[0];
