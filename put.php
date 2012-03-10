@@ -24,7 +24,7 @@ require('Lpf/Loader.php');
 Lpf_Loader::loadClass('Lpf_ErrorHandler');
 set_exception_handler(array('Lpf_ErrorHandler', 'exceptionHandler'));
 Lpf_Loader::registerAutoload();
-set_time_limit(1800);
+set_time_limit(0);
 
 if (isset($_SERVER['REQUEST_METHOD']))
 {
@@ -36,7 +36,7 @@ isset($argv)
 	&& isset($argv[1])
 	&& ($argv[1] == '-q' || $argv[1] == '--quet')
 	&& $quet = true
-	|| $quet = false;
+	or $quet = false;
 
 !$quet && print "=== Update process started ===\r\n";
 
