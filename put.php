@@ -48,6 +48,7 @@ foreach ($users as $key => $user)
 	try
 	{
 		$h->putValues($user);
+		system('rm -f ' . dirname(__FILE__) . '/image_cache/habrometr_*_feedbee.png');
 	}
 	catch (Exception $e)
 	{
@@ -60,7 +61,4 @@ foreach ($users as $key => $user)
 }
 
 !$quet && print "\r\nUsers updated: " . ($key+1) . "\r\n";
-
-system('rm -f ' . dirname(__FILE__) . '/image_cache/*');
-
 !$quet && print "=== Update process finished ===\r\n";
