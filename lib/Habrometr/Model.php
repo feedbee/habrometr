@@ -130,7 +130,7 @@ class Habrometr_Model
 	 */
 	private function _getUserLog($userId = 1, $count = 1)
 	{
-		$sth = $this->_pdo->prepare("SELECT karma_value, habraforce, rate_position, DATE_ADD(log_time, INTERVAL 3 HOUR) as log_time
+		$sth = $this->_pdo->prepare("SELECT karma_value, habraforce, rate_position, log_time as log_time
 								FROM `karmalog` where user_id = :uid order by log_time DESC limit :limit");
 		$sth->bindValue(':limit', $count, PDO::PARAM_INT);
 		$sth->bindValue(':uid', $userId, PDO::PARAM_INT);
@@ -160,7 +160,7 @@ class Habrometr_Model
 	 */
 	public function getHistoryGrouped($userId = 1, $count = 1)
 	{
-		$sth = $this->_pdo->prepare("SELECT avg(karma_value) as karma_value, avg(habraforce) as habraforce, avg(rate_position) as rate_position, DATE(DATE_ADD(log_time, INTERVAL 3 HOUR)) as `date`
+		$sth = $this->_pdo->prepare("SELECT avg(karma_value) as karma_value, avg(habraforce) as habraforce, avg(rate_position) as rate_position, DATE(log_time) as `date`
 								FROM `karmalog` where user_id = :uid group by `date` order by `date` DESC LIMIT :limit");
 		$sth->bindValue(':limit', $count, PDO::PARAM_INT);
 		$sth->bindValue(':uid', $userId, PDO::PARAM_INT);
@@ -264,7 +264,7 @@ class Habrometr_Model
 			CURLOPT_HEADER         => false,    // don't return headers
 			CURLOPT_FOLLOWLOCATION => true,     // follow redirects
 			CURLOPT_ENCODING       => "",       // handle all encodings
-			CURLOPT_USERAGENT      => sprintf("PHP/%s (Karmometr/%s; feedbee@gmail.com; http://karmometr.server.valera.ws/)", PHP_VERSION, self::VERSION), // who am i
+			CURLOPT_USERAGENT      => sprintf("PHP/%s (Habrometr/%s; feedbee@gmail.com; http://habrometr.ru/)", PHP_VERSION, self::VERSION),
 			CURLOPT_AUTOREFERER    => true,     // set referer on redirect
 			CURLOPT_CONNECTTIMEOUT => 120,      // timeout on connect
 			CURLOPT_TIMEOUT        => 120,      // timeout on response
