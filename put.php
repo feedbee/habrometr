@@ -47,7 +47,7 @@ foreach ($users as $key => $user)
 {
 	try
 	{
-		$h->putValues($user['user_id']);
+		$h->putValues($user);
 	}
 	catch (Exception $e)
 	{

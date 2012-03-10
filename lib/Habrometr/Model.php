@@ -212,12 +212,14 @@ class Habrometr_Model
 	/**
 	 * Put new Habravalues values to DB log by user id.
 	 *
-	 * @param int $userId
+	 * @param array $user
 	 * @param array $values
 	 */
-	public function putValues($userId)
+	public function putValues($user)
 	{
-		$userCode = $this->userId2Code($userId);
+		$userCode = $user['user_code'];
+		$userId = $user['user_id'];
+		
 		$values = $this->parsePage($userCode);
 
 		return $this->putValuesFromArray($userId, $values);
