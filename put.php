@@ -48,7 +48,8 @@ foreach ($users as $key => $user)
 	try
 	{
 		$h->putValues($user);
-		system('rm -f ' . dirname(__FILE__) . '/image_cache/habrometr_*_feedbee.png');
+		system('rm -f ' . dirname(__FILE__) . '/image_cache/habrometr_*_ '
+			. escapeshellcmd($user['user_code']) . '.png');
 	}
 	catch (Exception $e)
 	{
