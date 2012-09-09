@@ -1,4 +1,5 @@
 <?php echo $this->menuView(null, '/'); ?>
+
 <h1>
 	<img src="./stuff/logo.png" width="185" height="130" alt="Хаброметр (Habrometr)" title="Хаброметр (Habrometr)" align="left" />
 	Хаброметр (Habrometr) — сбор и графическое отображение показателей хабраюзеров
