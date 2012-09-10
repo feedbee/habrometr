@@ -5,9 +5,9 @@
 <?php } else { ?>
 <h2>Текущие хабразначения:</h2>
 <ul>
-	<li>Карма: <?php print $this->current['karma_value']; ?></li>
-	<li>Хабрасила: <?php print $this->current['habraforce']; ?></li>
-	<li>Позиция в рейтинге: <?php print $this->current['rate_position']; ?></li>
+	<li>Карма: <span class="label label-success"><?php print $this->current['karma_value']; ?></span></li>
+	<li>Хабрасила: <span class="label label-info"><?php print $this->current['habraforce']; ?></span></li>
+	<li>Позиция в рейтинге: <span class="label"><?php print $this->current['rate_position']; ?></span></li>
 </ul>
 <?php } ?>
 
@@ -15,11 +15,12 @@
 
 <p><img src="./habrometr_425x120_<?php print $this->userData['user_code']; ?>.png" width="425" height="120" alt="Хаброметр <?php print $this->userData['user_code']; ?>" title="Хаброметр <?php print $this->userData['user_code']; ?>" /></p>
 
-<h2>История хабразначений <?php print $this->userData['user_code']; ?>  за последние 90 дней<br />(отображается среднее значение показателей за сутки)</h2>
+<h2>История</h2>
+<p class="muted">История хабразначений <?php print $this->userData['user_code']; ?>  за последние 90 дней (отображается среднее значение показателей за сутки)</p>
 <?php if (!$this->history) { ?>
 <p>История пуста.</p>
 <?php } else { ?>
-<table border="1" cellpadding="3" cellspacing="0">
+<table class="table table-striped">
 	<tr>
 		<th>Карма</th>
 		<th>Хабрасила</th>
