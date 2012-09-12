@@ -1,6 +1,17 @@
+.logo {
+	margin-left: -0.42em;
+    margin-top: -0.405em;
+
+    float: left;
+}
 .footer {
 	padding: 2em 0;
 	margin-top: 2em;
 	border-top: 1px solid #E5E5E5;
 	background-color: whiteSmoke;
+}
+
+.habra-author {
+	padding-left: 1em;
+	background: url("../stuff/bg-user2.gif") no-repeat scroll 0 center transparent;
 }
