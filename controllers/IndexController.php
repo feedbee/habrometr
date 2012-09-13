@@ -31,8 +31,57 @@ class IndexController
 	
 	public function allUsersAction()
 	{
+		$itemsPerPage = 4;
+
+		// Defaults
+		$orderField = 'user_id';
+		$orderDirection = 'ASC';
+		$orderMark = '';
+		$page = 1;
+
+		// User Input
+		if (isset($_REQUEST['page']))
+		{
+			if (ctype_digit($_REQUEST['page']))
+			{
+				$page = $_REQUEST['page'];
+			}
+		}
+		if (isset($_REQUEST['order']))
+		{
+			$parts = explode('.', $_REQUEST['order']);
+			if (in_array(count($parts), array(1, 2)))
+			{
+				if (in_array(strtolower($parts[0]), array('name', 'regtime')))
+				{
+					$orderField = ($parts[0] == 'name' ? 'user_code' : 'user_id');
+					$orderMark = $parts[0];
+
+					if (isset($parts[1]) && in_array(strtolower($parts[1]), array('asc', 'desc')))
+					{
+						$orderDirection = strtoupper($parts[1]);
+						$orderMark .= ".{$parts[1]}";
+					}
+				}
+			}
+		}
+
+		$from = ($page - 1) * $itemsPerPage;
+		$result = Habrometr_Model::getInstance()->getUserList($orderField, $orderDirection, $from, $itemsPerPage);
+		$userList = $result['list'];
+		$overalCount = $result['overal_count'];
+		$overalPages = ceil($overalCount / $itemsPerPage);
+
+		if ($overalPages < $page)
+		{
+			throw new Exception('Error: page not found.', 404);
+		}
+
 		$view = Lpf_Dispatcher::getView();
-		$view->userList = Habrometr_Model::getInstance()->getUserList('user_id', 'ASC');
+		$view->userList = $userList;
+		$view->page = $page;
+		$view->orderMark = $orderMark !== '' ? "order-by-$orderMark/" : '';
+		$view->overalPages = $overalPages;
 	}
 	
 	public function registerAction()

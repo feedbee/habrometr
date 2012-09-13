@@ -346,7 +346,7 @@ class Habrometr_Model
 	 */
 	public function getUserList($orderField = null, $orderType = null, $from = null, $count = null)
 	{
-		$sql = 'SELECT user_id, user_code, user_email FROM `users`';
+		$sql = 'SELECT SQL_CALC_FOUND_ROWS user_id, user_code, user_email FROM `users`';
 		if (!is_null($orderField))
 		{
 			if (!in_array($orderField, array('user_id', 'user_code', 'user_email')))
@@ -363,21 +363,26 @@ class Habrometr_Model
 			}
 			$sql .= ' ' . strtoupper($orderType);
 		}
-		if (!is_null($from))
+		if (!is_null($count))
 		{
-			if (!ctype_digit((string)$from) || $from < 0)
-			{
-				throw new Exception('Habrometr_Model::getUserList: from field must be an integer geather than or equal 0', 210);
-			}
-			$sql .= ' LIMIT ' . $from;
-		}
-		if (!is_null($from) && !is_null($count))
-		{
-			if (!ctype_digit((string)$from) || $count <= 0)
+			if (!ctype_digit((string)$count) || $count <= 0)
 			{
 				throw new Exception('Habrometr_Model::getUserList: count field must be an integer geather than 0', 210);
 			}
-			$sql .= ', ' . $count;
+			
+
+			if (!is_null($from))
+			{
+				if (!ctype_digit((string)$from) || $from < 0)
+				{
+					throw new Exception('Habrometr_Model::getUserList: from field must be an integer geather than or equal to 0', 210);
+				}
+				$sql .= " LIMIT $from , $count";
+			}
+			else
+			{
+				$sql .= " LIMIT $from";
+			}
 		}
 		
 		$users = array();
@@ -385,15 +390,11 @@ class Habrometr_Model
 		{
 			$users[] = $user;
 		}
+
+		$stmt = $this->_pdo->query('SELECT FOUND_ROWS()', PDO::FETCH_COLUMN, 0);
+		$overalCount = $stmt->fetch();
 		
-		if ($users)
-		{
-			return $users;
-		}
-		else
-		{
-			return null;
-		}
+		return array('list' => $users, 'overal_count' => $overalCount);
 	}
 	
 	/**
