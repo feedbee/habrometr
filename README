@@ -1,6 +1,6 @@
 Habrometr Source Code.
 
-Version 1.0.
+Version 2.0.
 
 This program collects habrahabr.ru karma, habraforce and habra rate values and
 visualizes it on graphical informers.
@@ -25,10 +25,10 @@ The software published under GPL3 License.
 SOFTWARE DEPENDENCIES
 
 1) HTTP-Webserver (possible Apache);
-2) MySQL Database (4.x and heigher);
-3) PHP 5.1 or heigher with Curl and IMagick extensions;
+2) MySQL Database (5.x and heigher);
+3) PHP 5.1 or heigher with Curl, IMagick and memcache extensions;
 4) Image Magick libs;
-5) [Optional] nginx, eaccelerator.
+5) [Optional] nginx, eaccelerator, memcached.
 
 INSTALLATION
 
@@ -142,4 +142,3 @@ http {
         }
     }
 }
- 
