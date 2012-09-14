@@ -22,10 +22,10 @@ class IndexController
 		$view = Lpf_Dispatcher::getView();
 		
 		$view->getHelper('menuView')->setElements(array(
-			'/' => array('url' => './', 'text' => 'О Хаброметре'),
-			'/users' => array('url' => './users/', 'text' => 'Список всех пользователей'),
+			'/users' => array('url' => './users/', 'text' => 'Пользователи'),
 			'/register' => array('url' => './register/', 'text' => 'Регистрация'),
-			'/source' => array('url' => './source/', 'text' => 'Исходные коды')
+			'/source' => array('url' => './source/', 'text' => 'Исходные коды'),
+			'_ext' => array('url' => 'http://habrahabr.ru/post/141049/', 'text' => 'Виджет Mac OS X', 'external' => true)
 		));
 	}
 	
