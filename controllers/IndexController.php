@@ -25,7 +25,8 @@ class IndexController
 			'/' => array('url' => './', 'text' => 'О Хаброметре'),
 			'/users' => array('url' => './users/', 'text' => 'Список всех пользователей'),
 			'/register' => array('url' => './register/', 'text' => 'Регистрация'),
-			'/source' => array('url' => './source/', 'text' => 'Исходные коды')
+			'/source' => array('url' => './source/', 'text' => 'Исходные коды'),
+			'_ext' => array('url' => 'http://habrahabr.ru/post/141049/', 'text' => 'Виджет Mac OS X', 'external' => true)
 		));
 	}
 	

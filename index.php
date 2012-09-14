@@ -66,7 +66,7 @@ Lpf_Dispatcher::dispatch(null, $actionProcessed);
 $cont = ob_get_flush();
 
 // Cache
-if ($cont && $action != 'register')
+if ($cont && $action != 'register' && $action != 'all_users')
 {
 	$cacheTime = array('default' => 30 * 60, 'user_page' => 15 * 60, 'all_users' => 30 * 60, 'get' => 5 * 60);
 	$m = new Lpf_Memcache('habrometr');
