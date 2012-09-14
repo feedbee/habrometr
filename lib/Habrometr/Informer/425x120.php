@@ -1,4 +1,3 @@
-
 <?php
 /**
  *  Habrarabr.ru Habrometr.
