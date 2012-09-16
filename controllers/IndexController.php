@@ -42,7 +42,7 @@ class IndexController
 		// User Input
 		if (isset($_REQUEST['page']))
 		{
-			if (ctype_digit($_REQUEST['page']))
+			if (ctype_digit($_REQUEST['page']) && $_REQUEST['page'] > 0)
 			{
 				$page = $_REQUEST['page'];
 			}
