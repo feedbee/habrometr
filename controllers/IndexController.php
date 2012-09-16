@@ -31,12 +31,12 @@ class IndexController
 	
 	public function allUsersAction()
 	{
-		$itemsPerPage = 4;
+		$itemsPerPage = 30;
 
 		// Defaults
 		$orderField = 'user_id';
 		$orderDirection = 'ASC';
-		$orderMark = '';
+		$userRequestedOrder = null;
 		$page = 1;
 
 		// User Input
@@ -55,12 +55,12 @@ class IndexController
 				if (in_array(strtolower($parts[0]), array('name', 'regtime')))
 				{
 					$orderField = ($parts[0] == 'name' ? 'user_code' : 'user_id');
-					$orderMark = $parts[0];
+					$userRequestedOrder = $parts[0];
 
 					if (isset($parts[1]) && in_array(strtolower($parts[1]), array('asc', 'desc')))
 					{
 						$orderDirection = strtoupper($parts[1]);
-						$orderMark .= ".{$parts[1]}";
+						$userRequestedOrder .= ".{$parts[1]}";
 					}
 				}
 			}
@@ -80,8 +80,29 @@ class IndexController
 		$view = Lpf_Dispatcher::getView();
 		$view->userList = $userList;
 		$view->page = $page;
-		$view->orderMark = $orderMark !== '' ? "order-by-$orderMark/" : '';
+		$view->order = array('field' => $orderField, 'direction' => $orderDirection);
+		$view->requestedOrder = $userRequestedOrder;
 		$view->overalPages = $overalPages;
+
+		$view->userListPathBuilder = function ($order = null, $page = null)
+		{
+			$parts = array();
+			if (!is_null($order))
+			{
+				$parts[] = "order-by-{$order}";
+			}
+			if (!is_null($page))
+			{
+				$parts[] = "page-{$page}";
+			}
+			
+			if (count($parts) > 0)
+			{
+				return implode('/', $parts) . '/';
+			}
+
+			return '';
+		};
 	}
 	
 	public function registerAction()

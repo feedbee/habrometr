@@ -15,3 +15,17 @@
 	padding-left: 1em;
 	background: url("../stuff/bg-user2.gif") no-repeat scroll 0 center transparent;
 }
+
+a.label
+{
+	text-decoration: underline;
+}
+.label-transparent, .badge-transparent {
+	background-color: transparent;
+	color: black;
+}
+a.label-transparent:hover, a.badge-transparent:hover,
+a.label-transparent, a.badge-transparent {
+	color: #0088CC;
+	text-shadow: none;
+}
