@@ -5,7 +5,9 @@ $buildPath = $this->userListPathBuilder;
 echo $this->menuView(null, '/users');
 ?>
 <h1>Пользователи Хаброметра</h1>
-<p>Список пользователей Хабрахабра, которые зарегистрировались в Хаброметре.</p>
+<p>Список пользователей Хабрахабра, которые зарегистрировались в Хаброметре.<?php
+ if ($this->usersOveral > 0) {?> На сегодня это <?php echo $this->usersOveral; ?> человек<?php 
+ 	echo $this->flection($this->usersOveral, array('', 'а', '')); ?>.<?php } ?></p>
 
 <p>
 	Порядок вывода: <?php echo $this->selectorView(array(
@@ -16,7 +18,7 @@ echo $this->menuView(null, '/users');
 
 <?php
 $l = $this->userList;
-if (!count($l)) { ?><p class="muted">Ни один пользователь пока не зарегистрировался.</p><?php } else { ?>
+if ($this->usersOveral < 1) { ?><p class="muted">Ни один пользователь пока не зарегистрировался.</p><?php } else { ?>
 <ul class="unstyled">
 <?php
 		foreach($l as $user)

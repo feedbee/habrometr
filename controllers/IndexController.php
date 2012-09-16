@@ -79,6 +79,7 @@ class IndexController
 
 		$view = Lpf_Dispatcher::getView();
 		$view->userList = $userList;
+		$view->usersOveral = $overalCount;
 		$view->page = $page;
 		$view->order = array('field' => $orderField, 'direction' => $orderDirection);
 		$view->requestedOrder = $userRequestedOrder;
