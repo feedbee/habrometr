@@ -29,16 +29,16 @@
  */
 
 if (!file_exists(dirname(__FILE__) . '/pass.php'))
-	die('Read some comments in config.php!');
+	die('Read some comments in Config.php!');
 
 require(dirname(__FILE__) . '/pass.php');
 
 class Config
 {
-	const DB_USER = DBUSER;
-	const DB_PASS = DBPASS;
-	const DB_NAME = DBNAME;
+	const DB_USER = DB_USER;
+	const DB_PASS = DB_PASS;
+	const DB_NAME = DB_NAME;
 	
-	const SERVICE_URL = 'http://habrometr.ru';
+	const SERVICE_URL = SERVICE_URL;
 	const SERVICE_NAME = 'Хаброметр';
 }
