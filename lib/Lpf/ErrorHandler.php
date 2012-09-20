@@ -40,12 +40,12 @@ class Lpf_ErrorHandler
 			if ($exception->getCode() == 404)
 			{
 				header("HTTP/1.0 404 Not Found", true, 404);
-				die('<p align=center><font size=6>Error 404: Page Not Found</font></p>');
+				die('<h1 style="text-align:center;">Error 404: Page Not Found</h1>');
 			}
 			else
 			{
 				header("HTTP/1.0 500 Internal Server Error", true, 500);
-				die('<p align=center><font size=6>Error 500: Internal Server Error</font></p>');
+				die('<h1 style="text-align:center;">Error 500: Internal Server Error</h1>');
 			}
 		}
 	}	
