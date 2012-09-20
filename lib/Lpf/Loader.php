@@ -27,7 +27,7 @@ class Lpf_Loader
 		}
 
 		// autodiscover the path from the class name
-		$file = str_replace('_', DIRECTORY_SEPARATOR, $className) . '.php';
+		$file = str_replace(array('_', '\\'), DIRECTORY_SEPARATOR, $className) . '.php';
 		include($file);
 
 		if (!class_exists($className, false) && !interface_exists($className, false))

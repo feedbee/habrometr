@@ -31,7 +31,7 @@ class Lpf_ErrorHandler
 	static public function exceptionHandler($exception)
 	{
 		error_log("Unhandled exception: Code {$exception->getCode()}; Message: {$exception->getMessage()}");
-		if (defined('DEBUG') && DEBUG == true)
+		if (Config::DEBUG_MODE)
 		{
 			die("Unhandled exception: Code {$exception->getCode()}; Message: {$exception->getMessage()}");
 		}

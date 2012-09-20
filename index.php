@@ -17,15 +17,9 @@
  *  along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-session_start();
+require __DIR__ . '/bootstrap.php';
 
-set_include_path(dirname(__FILE__) . PATH_SEPARATOR . 
-	realpath(dirname(__FILE__) . '/lib') . PATH_SEPARATOR . get_include_path());
-require('Lpf/Loader.php');
-define('DEBUG', true);
-Lpf_Loader::loadClass('Lpf_ErrorHandler');
-set_exception_handler(array('Lpf_ErrorHandler', 'exceptionHandler'));
-Lpf_Loader::registerAutoload();
+session_start();
 
 // Routing
 if (isset($_GET['action']))

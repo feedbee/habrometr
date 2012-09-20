@@ -35,14 +35,17 @@ INSTALLATION
 1) Create new database and user. "Add" user to new database. Exequte SQL from
 ./habrometr.sql file.
 
-2) Create pass.php file with the next contents:
-Listing 1. pass.php
+2) Create config.local.php file with the next contents:
+Listing 1. config.local.php
 ---------------------------------------------------------------------------------
 <?php
 define('DB_USER', 'xxx');
 define('DB_PASS', 'yyy');
 define('DB_NAME', 'zzz');
 define('SERVICE_URL', 'http://localhost/habrometr');
+define('DEBUG_MODE', true); // true to dump uncatched exception message, false to
+                            // send wordless 404 or 500 responce codes
+define('LOG_LEVEL', 7);     // 0...7 according BSD Syslog message severities
 ---------------------------------------------------------------------------------
 Replace the xxx, yyy, zzz and www-root path with real values.
 

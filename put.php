@@ -17,13 +17,8 @@
  *  along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-set_include_path(dirname(__FILE__) . PATH_SEPARATOR . 
-	realpath(dirname(__FILE__) . '/lib') . PATH_SEPARATOR . get_include_path());
-require('Lpf/Loader.php');
+require __DIR__ . '/bootstrap.php';
 
-Lpf_Loader::loadClass('Lpf_ErrorHandler');
-set_exception_handler(array('Lpf_ErrorHandler', 'exceptionHandler'));
-Lpf_Loader::registerAutoload();
 set_time_limit(0);
 
 if (isset($_SERVER['REQUEST_METHOD']))
