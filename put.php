@@ -29,11 +29,11 @@ if (isset($_SERVER['REQUEST_METHOD']))
 
 isset($argv)
 	&& isset($argv[1])
-	&& ($argv[1] == '-q' || $argv[1] == '--quet')
-	&& $quet = true
-	or $quet = false;
+	&& ($argv[1] == '-q' || $argv[1] == '--quiet')
+	&& $quiet = true
+	or $quiet = false;
 
-!$quet && print "=== Update process started ===\r\n";
+!$quiet && print "=== Update process started ===\r\n";
 
 $h = Habrometr_Model::getInstance();
 $users = $h->getUserList();
@@ -49,12 +49,12 @@ foreach ($users as $key => $user)
 	catch (Exception $e)
 	{
 		$errorCounter++;
-		!$quet && print "Error updating user #$key";
+		!$quiet && print "Error updating user #$key";
 		if ($errorCounter > 30)
 			break;
 	}
-	!$quet && print "." . (($key+1) % 50 == 0 ? "\r\n" : '');
+	!$quiet && print "." . (($key+1) % 50 == 0 ? "\r\n" : '');
 }
 
-!$quet && print "\r\nUsers updated: " . ($key+1) . "\r\n";
-!$quet && print "=== Update process finished ===\r\n";
+!$quiet && print "\r\nUsers updated: " . ($key+1) . "\r\n";
+!$quiet && print "=== Update process finished ===\r\n";

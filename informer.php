@@ -31,7 +31,9 @@ if (isset($_GET['user']))
 {
 	$user = $_GET['user'];
 	if (!preg_match('#[a-zA-Z0-9\-_]{1,100}#', $user))
-		Habrometr_Informer::showError('User not found');
+	{
+		Habrometr_Informer::showError('User not found', 425, 120);
+	}
 }
 else
 {
@@ -42,7 +44,9 @@ if (isset($_GET['w']))
 {
 	$width = $_GET['w'];
 	if (!ctype_digit($width))
+	{
 		Habrometr_Informer::showError("Width must be an integer ($width given)", 425, 120);
+	}
 }
 else
 {
@@ -53,7 +57,9 @@ if (isset($_GET['h']))
 {
 	$height = $_GET['h'];
 	if (!ctype_digit($height))
+	{
 		Habrometr_Informer::showError("Height must be an integer ($height given)", $width, 120);
+	}
 }
 else
 {

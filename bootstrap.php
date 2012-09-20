@@ -17,7 +17,7 @@
  *  along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-// Include pathes
+// Include paths
 set_include_path(__DIR__
 	. PATH_SEPARATOR . realpath(__DIR__ . '/lib')
 	. PATH_SEPARATOR . realpath(__DIR__ . '/vendor/zf2/library')
