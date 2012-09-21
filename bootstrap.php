@@ -38,12 +38,31 @@ $filter = new Zend\Log\Filter\Priority(Config::LOG_LEVEL);
 $writer->addFilter($filter);
 Zend\Log\Logger::registerErrorHandler($logger);
 
+/**
+ * @method static void debug() debug(string $message, array $extra = array())
+ * @method static void debug() info(string $message, array $extra = array())
+ * @method static void debug() notice(string $message, array $extra = array())
+ * @method static void debug() warn(string $message, array $extra = array())
+ * @method static void debug() err(string $message, array $extra = array())
+ * @method static void debug() crit(string $message, array $extra = array())
+ * @method static void debug() alert(string $message, array $extra = array())
+ * @method static void debug() emerg(string $message, array $extra = array())
+ */
 class Log
 {
 	static private $logger;
+
+	/**
+	 * @return \Zend\Log\Logger
+	 */
 	static public function getLogger()
 	{
 		return self::$logger;
+	}
+	static public function __callStatic($name, $arguments)
+	{
+		$logger = self::getLogger();
+		return call_user_func_array(array($logger, $name), $arguments);
 	}
 	static public function initialize($logger)
 	{
@@ -56,3 +75,5 @@ class Log
 	}
 }
 Log::initialize($logger);
+Log::debug(sprintf('Bootstrap: finished (debug mode %s, log level %d)',
+	(Config::DEBUG_MODE ? 'on' : 'off'), Config::LOG_LEVEL));
