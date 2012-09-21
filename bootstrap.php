@@ -40,13 +40,13 @@ Zend\Log\Logger::registerErrorHandler($logger);
 
 /**
  * @method static void debug() debug(string $message, array $extra = array())
- * @method static void debug() info(string $message, array $extra = array())
- * @method static void debug() notice(string $message, array $extra = array())
- * @method static void debug() warn(string $message, array $extra = array())
- * @method static void debug() err(string $message, array $extra = array())
- * @method static void debug() crit(string $message, array $extra = array())
- * @method static void debug() alert(string $message, array $extra = array())
- * @method static void debug() emerg(string $message, array $extra = array())
+ * @method static void info() info(string $message, array $extra = array())
+ * @method static void notice() notice(string $message, array $extra = array())
+ * @method static void warn() warn(string $message, array $extra = array())
+ * @method static void err() err(string $message, array $extra = array())
+ * @method static void crit() crit(string $message, array $extra = array())
+ * @method static void alert() alert(string $message, array $extra = array())
+ * @method static void emerg() emerg(string $message, array $extra = array())
  */
 class Log
 {
