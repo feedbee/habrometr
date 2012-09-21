@@ -19,10 +19,17 @@
 
 require __DIR__ . '/bootstrap.php';
 
+Log::debug('pull.php: started');
 set_time_limit(0);
+
+$errorConsoleWriter = new Zend\Log\Writer\Stream('php://stderr');
+$logger->addWriter($errorConsoleWriter);
+$filter = new Zend\Log\Filter\Priority(Zend\Log\Logger::NOTICE);
+$errorConsoleWriter->addFilter($filter);
 
 if (isset($_SERVER['REQUEST_METHOD']))
 {
+	Log::warn(sprintf('pull.php: web access attempt (%s)', $_SERVER['REQUEST_URI']));
 	header('Forbidden', true, 403);
 	die('Forbidden');
 }
@@ -32,8 +39,10 @@ isset($argv)
 	&& ($argv[1] == '-q' || $argv[1] == '--quiet')
 	&& $quiet = true
 	or $quiet = false;
+Log::info(sprintf('pull.php: verbosity %s', $quiet ? ' disabled' : 'enabled'));
 
 !$quiet && print "=== Update process started ===\r\n";
+Log::info('pull.php: update process started ');
 
 $h = Habrometr_Model::getInstance();
 $users = $h->getUserList();
@@ -43,18 +52,25 @@ foreach ($users as $key => $user)
 	try
 	{
 		$h->putValues($user);
-		system('rm -f ' . dirname(__FILE__) . '/image_cache/habrometr_*_'
+		system('rm -f ' . __DIR__ . '/image_cache/habrometr_*_'
 			. escapeshellcmd($user['user_code']) . '.png');
 	}
 	catch (Exception $e)
 	{
 		$errorCounter++;
-		!$quiet && print "Error updating user #$key";
+		!$quiet && print "Error updating user [$key] {$user['user_code']}";
+		Log::err(sprintf('pull.php: error updating user [%s] %s)', $key, $user['user_code']));
 		if ($errorCounter > 30)
+		{
+			Log::crit('pull.php: error counter exceed 30 - break update process)');
 			break;
+		}
 	}
 	!$quiet && print "." . (($key+1) % 50 == 0 ? "\r\n" : '');
+	Log::debug(sprintf('pull.php: user [%s] %s updated', $key, $user['user_code']));
 }
 
-!$quiet && print "\r\nUsers updated: " . ($key+1) . "\r\n";
+$updated = $key + 1;
+!$quiet && print "\r\nUsers updated: {$updated}\r\n";
 !$quiet && print "=== Update process finished ===\r\n";
+Log::info(sprintf('pull.php: update process finished (users updated: %d) ', $updated));
