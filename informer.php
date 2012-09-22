@@ -17,9 +17,9 @@
  *  along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-$timeStart = microtime(true);
-
 require __DIR__ . '/bootstrap.php';
+
+$timeStart = microtime(true);
 
 if (isset($_GET['user']))
 {
@@ -78,24 +78,35 @@ $informer = new $className($user);
 // Is user's habrometr cached?
 if ($informer->existsInCache())
 {
+	Log::info(sprintf('informer.php: informer `%s` loaded from cache', $className));
 	$informer->printFromCache();
 	exit;
 }
 
 if (!$informer->prepare())
 {
+	Log::err('Informer preparing failed');
 	throw new Exception('Informer preparing failed');
 }
 
 if (!$informer->build())
 {
+	Log::err('Informer building failed');
 	throw new Exception('Informer building failed');
 }
 
 $informer->printCanvas();
-$informer->saveToCache();
+try
+{
+	$informer->saveToCache();
+}
+catch (Exception $e)
+{
+	Log::warn(sprintf('informer.php: exception thrown while trying to save informer to cache: `%s`',
+		$e->getMessage()));
+}
 $informer->destroyCanvas();
 
 $timeFull = microtime(true) - $timeStart;
-file_put_contents(dirname(__FILE__) . '/../generation_log.txt',
-	"{$_SERVER['REQUEST_URI']}\t{$timeFull}\t" . date('Y-m-d H:i:s') . "\n", FILE_APPEND);
+Log::info(sprintf('informer.php: informer `%s` created, generated in %f seconds',
+	$className, $timeFull));
