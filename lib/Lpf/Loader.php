@@ -49,6 +49,5 @@ class Lpf_Loader
 	public static function registerAutoload()
 	{
 		spl_autoload_register(array(__CLASS__, 'autoload'));
-		Log::debug('Lpf_Loader: autoloading registered');
 	}
 }
