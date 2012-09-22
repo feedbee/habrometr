@@ -72,10 +72,12 @@ Log::debug(sprintf('index.php: dispatcherization finished (controller = $s, acti
 // Cache
 if ($cont && $action != 'register' && $action != 'all_users')
 {
-	Log::debug(sprintf('index.php: save cache for %s', $_SERVER['REQUEST_URI']));
 	$cacheTime = array('default' => 30 * 60, 'user_page' => 15 * 60, 'all_users' => 30 * 60, 'get' => 5 * 60);
+	$cacheTimeSeconds = isset($cacheTime[$action]) ? $cacheTime[$action] : 10 * 60;
 	$m = new Lpf_Memcache('habrometr');
-	$m->set($_SERVER['REQUEST_URI'], $cont . "\r\n<!-- cached version " . date('r') . ' -->', 0, isset($cacheTime[$action]) ? $cacheTime[$action] : 10 * 60);
+	$m->set($_SERVER['REQUEST_URI'], $cont . "\r\n<!-- cached version " . date('r') . ' -->', 0, $cacheTimeSeconds);
+	Log::debug(sprintf('index.php: cache saved for `%s` expire in %d seconds',
+		$_SERVER['REQUEST_URI'], $cacheTimeSeconds));
 }
 
 Log::debug(sprintf('index.php: finished (%s)', $_SERVER['REQUEST_URI']));
