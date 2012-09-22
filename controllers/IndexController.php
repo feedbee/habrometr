@@ -62,7 +62,7 @@ class IndexController
 			{
 				try
 				{
-					$habravaluesFromXML = Habrometr_Model::getInstance()->parsePage($user_code);
+					$habravaluesFromXML = Habrometr_Model::getInstance()->getRemoteValues($user_code);
 				}
 				catch(Exception $e)
 				{
@@ -93,7 +93,7 @@ class IndexController
 					$ok = true;
 					try
 					{
-						Habrometr_Model::getInstance()->putValuesFromArray($userId, $habravaluesFromXML);
+						Habrometr_Model::getInstance()->pushValues($userId, $habravaluesFromXML);
 					}
 					catch (Exception $e)
 					{}

@@ -51,7 +51,7 @@ foreach ($users as $key => $user)
 {
 	try
 	{
-		$h->putValues($user);
+		$h->pullValues($user);
 		system('rm -f ' . __DIR__ . '/image_cache/habrometr_*_'
 			. escapeshellcmd($user['user_code']) . '.png');
 	}
