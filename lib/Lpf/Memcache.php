@@ -25,9 +25,12 @@ class Lpf_Memcache extends Memcache
 	{
 		if (!$this->connect($server, $port))
 		{
+			Log::err('Lpf_Memcache: connection failed');
 			throw new Exception('Memcache connection error', 601);
 		}
 		$this->_namespace = $namespace;
+		Log::debug(sprintf('Lpf_Memcache: connection established to %s:%d, namespace `%s`',
+			$server, $port, $namespace));
 	}
 
 	public function get($key, $flag = null)

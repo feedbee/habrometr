@@ -26,7 +26,6 @@ class Lpf_Loader
 			return;
 		}
 
-		// autodiscover the path from the class name
 		$file = str_replace(array('_', '\\'), DIRECTORY_SEPARATOR, $className) . '.php';
 		include($file);
 
@@ -50,5 +49,6 @@ class Lpf_Loader
 	public static function registerAutoload()
 	{
 		spl_autoload_register(array(__CLASS__, 'autoload'));
+		Log::debug('Lpf_Loader: autoloading registered');
 	}
 }
