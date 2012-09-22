@@ -61,12 +61,12 @@ else
 Log::debug(sprintf('index.php: routing finished (controller = %s, action = %s)', $logController, $logAction));
 
 // Dispatch
-Log::debug(sprintf('index.php: dispatcherization started (controller = $s, action = %s)',
+Log::debug(sprintf('index.php: dispatcherization started (controller = %s, action = %s)',
 	$controllerProcessed, $actionProcessed));
 ob_start();
 Lpf_Dispatcher::dispatch(null, $actionProcessed);
 $cont = ob_get_flush();
-Log::debug(sprintf('index.php: dispatcherization finished (controller = $s, action = %s)',
+Log::debug(sprintf('index.php: dispatcherization finished (controller = %s, action = %s)',
 	$controllerProcessed, $actionProcessed));
 
 // Cache
