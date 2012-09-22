@@ -31,12 +31,17 @@ class Lpf_ErrorHandler
 	static public function exceptionHandler($exception)
 	{
 		error_log("Unhandled exception: Code {$exception->getCode()}; Message: {$exception->getMessage()}");
-		Log::err(sprintf('Lpf_ExceptionHandler: Unhandled exception [%s] `%s`',
-			$exception->getCode(), $exception->getMessage()));
+		if (class_exists('Log') && !is_null(Log::getLogger()))
+		{
+			Log::err(sprintf('Lpf_ExceptionHandler: Unhandled exception [%s] `%s`',
+				$exception->getCode(), $exception->getMessage()));
+		}
 
 		if (Config::DEBUG_MODE)
 		{
-			die("Unhandled exception: Code {$exception->getCode()}; Message: {$exception->getMessage()}");
+			echo "[Debug mode] Unhandled exception: Code {$exception->getCode()}; Message: {$exception->getMessage()}\r\n";
+			echo $exception->getTraceAsString();
+			exit;
 		}
 		else
 		{

@@ -62,6 +62,10 @@ class Log
 	static public function __callStatic($name, $arguments)
 	{
 		$logger = self::getLogger();
+		if (is_null($logger))
+		{
+			throw new Exception("Log: logger is not initialized");
+		}
 		return call_user_func_array(array($logger, $name), $arguments);
 	}
 	static public function initialize($logger)
