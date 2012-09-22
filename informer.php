@@ -19,13 +19,7 @@
 
 $timeStart = microtime(true);
 
-set_include_path(dirname(__FILE__) . PATH_SEPARATOR . 
-	realpath(dirname(__FILE__) . '/lib') . PATH_SEPARATOR . get_include_path());
-require('Lpf/Loader.php');
-
-Lpf_Loader::loadClass('Lpf_ErrorHandler');
-set_exception_handler(array('Lpf_ErrorHandler', 'exceptionHandler'));
-Lpf_Loader::registerAutoload();
+require __DIR__ . '/bootstrap.php';
 
 if (isset($_GET['user']))
 {
