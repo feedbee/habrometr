@@ -52,21 +52,21 @@ class Lpf_Memcache extends Memcache
 
 	public function delete($key, $timeout = 0)
 	{
-		return parent::delete($this->_namespace . $key, $timeout);
+		parent::delete($this->_namespace . $key, $timeout);
 	}
 
 	public function replace($key, $newValue, $flag = 0, $expire = 0)
 	{
-		return parent::replace($this->_namespace . $key, $newValue, $flag, $expire);
+		parent::replace($this->_namespace . $key, $newValue, $flag, $expire);
 	}
 
 	public function increment($key, $value = 1)
 	{
-		return parent::increment($this->_namespace . $key, $value);
+		parent::increment($this->_namespace . $key, $value);
 	}
 
 	public function decrement($key, $value = 1)
 	{
-		return parent::decrement($this->_namespace . $key, $value);
+		parent::decrement($this->_namespace . $key, $value);
 	}
 }
