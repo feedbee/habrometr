@@ -393,10 +393,15 @@ class Habrometr_Model
 					throw new Exception('Habrometr_Model::getUserList: filter array elements [0] element must be one of: user_id, user_code, user_email', 210);
 				}
 				$field = $element[0];
-				$operator = '=';
+				$operator = in_array($field, array('user_code', 'user_email')) ? 'LIKE' : '=';
 				$parameter = ":{$field}_$index";
 				$conditions[] = "$field $operator $parameter";
-				$parameters[$parameter] = $element[1];
+				$value = str_replace(array('\\', '%', '_'), // escape value for MySQL LIKE syntax
+									 array('\\\\', '\\%', '\\_'),
+									 $element[1]);
+				// translate * -> %, ? -> _, according to MySQL LIKE syntax
+				$value = str_replace(array('*', '?'), array('%', '_'), $value);
+				$parameters[$parameter] = $value;
 			}
 
 			if (count($conditions) > 0)
