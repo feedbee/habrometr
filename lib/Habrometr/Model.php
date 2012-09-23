@@ -429,7 +429,7 @@ class Habrometr_Model
 		{
 			if (!ctype_digit((string)$from) || $from < 0)
 			{
-				throw new Exception('Habrometr_Model::getUserList: from field must be an integer geather than or equal 0', 210);
+				throw new Exception('Habrometr_Model::getUserList: from field must be an integer greater than or equal 0', 210);
 			}
 			$sql .= ' LIMIT ' . $from;
 		}
@@ -437,7 +437,7 @@ class Habrometr_Model
 		{
 			if (!ctype_digit((string)$from) || $count <= 0)
 			{
-				throw new Exception('Habrometr_Model::getUserList: count field must be an integer geather than 0', 210);
+				throw new Exception('Habrometr_Model::getUserList: count field must be an integer greater than 0', 210);
 			}
 			$sql .= ', ' . $count;
 		}
