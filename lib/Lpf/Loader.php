@@ -1,6 +1,6 @@
 <?php
 /**
- *  Habrarabr.ru Habrometr.
+ *  Habrahabr.ru Habrometr.
  *  Copyright (C) 2009 Leontyev Valera
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -26,8 +26,7 @@ class Lpf_Loader
 			return;
 		}
 
-		// autodiscover the path from the class name
-		$file = str_replace('_', DIRECTORY_SEPARATOR, $className) . '.php';
+		$file = str_replace(array('_', '\\'), DIRECTORY_SEPARATOR, $className) . '.php';
 		include($file);
 
 		if (!class_exists($className, false) && !interface_exists($className, false))

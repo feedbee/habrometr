@@ -1,6 +1,6 @@
 <?php
 /**
- *  Habrarabr.ru Habrometr.
+ *  Habrahabr.ru Habrometr.
  *  Copyright (C) 2009 Leontyev Valera
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -18,7 +18,7 @@
  */
 
 /**
- * Habrarabr.ru Habrometr.
+ * Habrahabr.ru Habrometr.
  * http://habrometr.ru/
  *
  * @author Valera Leontyev (feedbee)
@@ -35,7 +35,7 @@ class Habrometr_Model
 	/**
 	 * Reference
 	 *
-	 * @var Habrometr
+	 * @var Habrometr_Model
 	 */
 	private static $_instance = null;
 	/**
@@ -125,18 +125,20 @@ class Habrometr_Model
 	 * Returns array of values array or null in case of failure.
 	 *
 	 * @param int $userId
-	 * @param int $count
+	 * @param int $recordsLimit
 	 * @return array
 	 */
-	private function _getUserLog($userId = 1, $count = 1)
+	private function _getUserLog($userId = 1, $recordsLimit = 1)
 	{
+		Log::debug(sprintf("Habrometr_Model: user log access for User ID `%d`", $userId));
 		$sth = $this->_pdo->prepare("SELECT karma_value, habraforce, rate_position, log_time as log_time
 								FROM `karmalog` where user_id = :uid order by log_time DESC limit :limit");
-		$sth->bindValue(':limit', $count, PDO::PARAM_INT);
+		/* @var PDOStatement $sth */
+		$sth->bindValue(':limit', $recordsLimit, PDO::PARAM_INT);
 		$sth->bindValue(':uid', $userId, PDO::PARAM_INT);
 		if (!$sth->execute())
 		{
-			throw new Exception('User addition — DB query failed: ' . $this->_pdo->errorInfo(), $this->_pdo->errorCode());
+			throw new Exception('getUserLog — DB query failed: ' . $this->_pdo->errorInfo(), $this->_pdo->errorCode());
 		}
 		$rows = $sth->fetchAll(PDO::FETCH_ASSOC);
 		
@@ -151,7 +153,7 @@ class Habrometr_Model
 	}
 	
 	/**
-	 * Query to DB to get Habravalues groupped by days.
+	 * Query to DB to get Habravalues grouped by days.
 	 * Returns array of values array or null in case of failure.
 	 *
 	 * @param int $userId
@@ -160,13 +162,15 @@ class Habrometr_Model
 	 */
 	public function getHistoryGrouped($userId = 1, $count = 1)
 	{
+		Log::debug(sprintf("Habrometr_Model: grouped user log access for User ID `%d`", $userId));
 		$sth = $this->_pdo->prepare("SELECT avg(karma_value) as karma_value, avg(habraforce) as habraforce, avg(rate_position) as rate_position, DATE(log_time) as `date`
 								FROM `karmalog` where user_id = :uid group by `date` order by `date` DESC LIMIT :limit");
+		/* @var PDOStatement $sth */
 		$sth->bindValue(':limit', $count, PDO::PARAM_INT);
 		$sth->bindValue(':uid', $userId, PDO::PARAM_INT);
 		if (!$sth->execute())
 		{
-			throw new Exception('User addition — DB query failed: ' . $this->_pdo->errorInfo(), $this->_pdo->errorCode());
+			throw new Exception('getHistoryGrouped — DB query failed: ' . $this->_pdo->errorInfo(), $this->_pdo->errorCode());
 		}
 		$rows = $sth->fetchAll(PDO::FETCH_ASSOC);
 		
@@ -188,14 +192,16 @@ class Habrometr_Model
 	 */
 	public function getExtremums($userId = 1)
 	{
+		Log::debug(sprintf("Habrometr_Model: extremums calculation for User ID `%d`", $userId));
 		$sth = $this->_pdo->prepare("SELECT max(karma_value) as karma_max, min(karma_value) as karma_min,
 								max(habraforce) as habraforce_max, min(habraforce) as habraforce_min,
 								max(rate_position) as rate_max, min(rate_position) as rate_min
 								FROM `karmalog` WHERE user_id = :uid");
+		/* @var PDOStatement $sth */
 		$sth->bindValue(':uid', $userId, PDO::PARAM_INT);
 		if (!$sth->execute())
 		{
-			throw new Exception('User addition — DB query failed: ' . $this->_pdo->errorInfo(), $this->_pdo->errorCode());
+			throw new Exception('getExtremums — DB query failed: ' . $this->_pdo->errorInfo(), $this->_pdo->errorCode());
 		}
 		$row = $sth->fetch(PDO::FETCH_ASSOC);
 		
@@ -210,22 +216,25 @@ class Habrometr_Model
 	}
 
 	/**
-	 * Put new Habravalues values to DB log by user id.
+	 * Update Habravalues values in database from Habrahabr web-site.
 	 *
-	 * @param array $user
-	 * @param array $values
+	 * @param array $user User data array
 	 */
-	public function putValues($user)
+	public function pullValues($user)
 	{
 		$userCode = $user['user_code'];
-		$userId = $user['user_id'];
-		
-		$values = $this->parsePage($userCode);
 
-		return $this->putValuesFromArray($userId, $values);
+		$this->getRemoteValues($userCode);
 	}
-	
-	public function putValuesFromArray($userId, $values)
+
+	/**
+	 * Save new user Habravalues to database
+	 *
+	 * @param $userId
+	 * @param $values
+	 * @throws Exception
+	 */
+	public function pushValues($userId, $values)
 	{
 		$values = array(
 			'user_id' => $userId,
@@ -236,73 +245,92 @@ class Habrometr_Model
 		try
 		{
 			$sth = $this->_pdo->prepare("INSERT `karmalog` (user_id, karma_value, habraforce, rate_position) VALUES (:uid, :k, :hf, :r)");
+			/* @var PDOStatement $sth */
 			$sth->bindValue(':uid', $values['user_id']);
 			$sth->bindValue(':k', $values['karma_value']);
 			$sth->bindValue(':hf', $values['habraforce']);
 			$sth->bindValue(':r', $values['rate_position']);
 			if (!$sth->execute())
 			{
-				throw new Exception('User addition — DB query failed: ' . $this->_pdo->errorInfo(), $this->_pdo->errorCode());
+				throw new Exception('Update values — DB query failed: ' . $this->_pdo->errorInfo(), $this->_pdo->errorCode());
 			}
 		}
 		catch (Exception $e)
 		{
-			throw new Exception('Saving data — DB query failed: ' . $e->getMessage(), 202);
+			$message = "Saving data — DB query failed: {$e->getMessage()}";
+			Log::err($message);
+			throw new Exception($message, 202);
 		}
-
-		return true;
+		Log::debug(sprintf("Habrometr_Model: values updated in database for User ID `%d`", $userId));
 	}
 
 	/**
-	 * Get user data from habrahabr, parse Habravalues and return it in array.
+	 * Get user data from Habrahabr web-site in array.
 	 *
-	 * @param int $userCode
+	 * @param string $userCode Habrahabr user code
+	 * @return array
 	 */
-	public function parsePage($userCode = 1)
+	public function getRemoteValues($userCode)
 	{
+		$xmlString = $this->getRemoteUserDataXml($userCode);
+
+		try
+		{
+			$xmlRoot = new SimpleXMLElement($xmlString);
+			
+			if (false != ($e = $xmlRoot->xpath('/habrauser/error')))
+			{
+				throw new Exception('Error value received: ' . $e, 205);
+			}
+			
+			$data = array();
+			$data['karma']['value'] = $xmlRoot->karma;
+			$data['habraforce']['value'] = $xmlRoot->rating;
+			$data['rate']['value'] = $xmlRoot->ratingPosition;
+		}
+		catch (Exception $e)
+		{
+			Log::warn(sprintf("Habrometr_Model: parsing Habrahabr XML user failed", $userCode));
+			Log::warn(sprintf("Habrometr_Model: failed XML string is `%s`", $xmlString));
+			throw new Exception("Parsing Habravalues failure: " . $e->getMessage(), $e->getCode() > 0 ? $e->getCode() : 204);
+		}
+
+		return $data;
+	}
+
+	private function getRemoteUserDataXml($userCode)
+	{
+		$agent = sprintf("PHP/%s (Habrometr/%s; feedbee@gmail.com; http://habrometr.ru/)", PHP_VERSION, self::VERSION);
 		$ch = curl_init("http://habrahabr.ru/api/profile/{$userCode}/");
 		$options = array(
 			CURLOPT_RETURNTRANSFER => true,     // return web page
 			CURLOPT_HEADER         => false,    // don't return headers
 			CURLOPT_FOLLOWLOCATION => true,     // follow redirects
 			CURLOPT_ENCODING       => "",       // handle all encodings
-			CURLOPT_USERAGENT      => sprintf("PHP/%s (Habrometr/%s; feedbee@gmail.com; http://habrometr.ru/)", PHP_VERSION, self::VERSION),
+			CURLOPT_USERAGENT      => $agent,   // set user-agent header
 			CURLOPT_AUTOREFERER    => true,     // set referer on redirect
 			CURLOPT_CONNECTTIMEOUT => 120,      // timeout on connect
 			CURLOPT_TIMEOUT        => 120,      // timeout on response
 			CURLOPT_MAXREDIRS      => 10,       // stop after 10 redirects
 		);
 		curl_setopt_array($ch, $options);
-		$cont = curl_exec($ch);
-		
-		// UTF-8!!!
-		if (!$cont)
+
+		$time = microtime(true);
+		$page = curl_exec($ch);
+		curl_close($ch);
+		$requestTime = (microtime(true) - $time);
+
+		if (!$page)
 		{
+			Log::warn(sprintf("Habrometr_Model: Habrahabr page loading for user `%s` failed, request time %f seconds",
+				$userCode, $requestTime));
 			throw new Exception("Downloading http://habrahabr.ru/api/profile/{$userCode}/ failed: " . curl_errno($ch) . ' ' . curl_error($ch), 203);
 		}
-			
-		curl_close($ch);
 
-		try
-		{
-			$xml = new SimpleXMLElement($cont);
-			
-			if (false != ($e = $xml->xpath('/habrauser/error')))
-			{
-				throw new Exception('Error value received: ' . $e, 205);
-			}
-			
-			$data = array();
-			$data['karma']['value'] = $xml->karma;
-			$data['habraforce']['value'] = $xml->rating;
-			$data['rate']['value'] = $xml->ratingPosition;
-		}
-		catch (Exception $e)
-		{
-			throw new Exception("Parsing Habravalues failure: " . $e->getMessage(), $e->getCode() > 0 ? $e->getCode() : 204);
-		}
+		Log::debug(sprintf("Habrometr_Model: Habrahabr page loaded for user `%s`, request time %f seconds",
+			$userCode, $requestTime));
 
-		return $data;
+		return $page;
 	}
 	
 	/**
@@ -314,10 +342,11 @@ class Habrometr_Model
 	public function getUser($userId)
 	{
 		$sth = $this->_pdo->prepare("SELECT user_id, user_code, user_email FROM `users` WHERE user_id = :uid");
+		/* @var PDOStatement $sth */
 		$sth->bindValue(':uid', $userId, PDO::PARAM_INT);
 		if (!$sth->execute())
 		{
-			throw new Exception('User addition — DB query failed: ' . $this->_pdo->errorInfo(), $this->_pdo->errorCode());
+			throw new Exception('getUser — DB query failed: ' . $this->_pdo->errorInfo(), $this->_pdo->errorCode());
 		}
 		$row = $sth->fetch(PDO::FETCH_ASSOC);
 		
@@ -332,21 +361,54 @@ class Habrometr_Model
 	}
 	
 	/**
-	 * Get registed user list from DB.
+	 * Get registered user list from DB.
 	 * 
 	 * Default values mean all users without any order.
 	 * 
-	 * Returns two demensional array of user information.
+	 * Returns two dimensional array of user information.
 	 *
+	 * @param array $filter array of where conditions
 	 * @param string $orderField user_id, user_code or user_email
 	 * @param string $orderType asc/desc
 	 * @param int $from LIMIT __
 	 * @param int $count LIMIT xx, __
 	 * @return array
 	 */
-	public function getUserList($orderField = null, $orderType = null, $from = null, $count = null)
+	public function getUserList(array $filter = array(), $orderField = null,
+		$orderType = null, $from = null, $count = null)
 	{
 		$sql = 'SELECT SQL_CALC_FOUND_ROWS user_id, user_code, user_email FROM `users`';
+
+		$conditions = $parameters = array();
+		if (count($filter) > 0)
+		{
+			foreach (array_values($filter) as $index => $element)
+			{
+				if (!is_array($element) || count($element) < 2)
+				{
+					throw new Exception('Habrometr_Model::getUserList: filter array elements must be array with at least 2 elements', 210);
+				}
+				if (!in_array($element[0], array('user_id', 'user_code', 'user_email')))
+				{
+					throw new Exception('Habrometr_Model::getUserList: filter array elements [0] element must be one of: user_id, user_code, user_email', 210);
+				}
+				$field = $element[0];
+				$operator = in_array($field, array('user_code', 'user_email')) ? 'LIKE' : '=';
+				$parameter = ":{$field}_$index";
+				$conditions[] = "$field $operator $parameter";
+				$value = str_replace(array('\\', '%', '_'), // escape value for MySQL LIKE syntax
+									 array('\\\\', '\\%', '\\_'),
+									 $element[1]);
+				// translate * -> %, ? -> _, according to MySQL LIKE syntax
+				$value = str_replace(array('*', '?'), array('%', '_'), $value);
+				$parameters[$parameter] = $value;
+			}
+
+			if (count($conditions) > 0)
+			{
+				$sql .= "\r\nWHERE " . implode("\r\n AND ", $conditions) . "\r\n";
+			}
+		}
 		if (!is_null($orderField))
 		{
 			if (!in_array($orderField, array('user_id', 'user_code', 'user_email')))
@@ -363,37 +425,44 @@ class Habrometr_Model
 			}
 			$sql .= ' ' . strtoupper($orderType);
 		}
-		if (!is_null($count))
+		if (!is_null($from))
 		{
-			if (!ctype_digit((string)$count) || $count <= 0)
+			if (!ctype_digit((string)$from) || $from < 0)
 			{
-				throw new Exception('Habrometr_Model::getUserList: count field must be an integer geather than 0', 210);
+				throw new Exception('Habrometr_Model::getUserList: from field must be an integer greater than or equal 0', 210);
 			}
-			
+			$sql .= ' LIMIT ' . $from;
+		}
+		if (!is_null($from) && !is_null($count))
+		{
+			if (!ctype_digit((string)$from) || $count <= 0)
+			{
+				throw new Exception('Habrometr_Model::getUserList: count field must be an integer greater than 0', 210);
+			}
+			$sql .= ', ' . $count;
+		}
 
-			if (!is_null($from))
-			{
-				if (!ctype_digit((string)$from) || $from < 0)
-				{
-					throw new Exception('Habrometr_Model::getUserList: from field must be an integer geather than or equal to 0', 210);
-				}
-				$sql .= " LIMIT $from , $count";
-			}
-			else
-			{
-				$sql .= " LIMIT $from";
-			}
+		$sth = $this->_pdo->prepare($sql);
+		/* @var PDOStatement $sth */
+		foreach ($parameters as $parameter => $value)
+		{
+			$sth->bindParam($parameter, $value);
+		}
+
+		if (!$sth->execute())
+		{
+			throw new Exception('Habrometr_Model::getUserList — DB query failed: ' . $this->_pdo->errorInfo(), $this->_pdo->errorCode());
 		}
 		
 		$users = array();
-		foreach($this->_pdo->query($sql, PDO::FETCH_ASSOC) as $user)
+		while(false !== ($user = $sth->fetch(PDO::FETCH_ASSOC)))
 		{
 			$users[] = $user;
 		}
 
 		$stmt = $this->_pdo->query('SELECT FOUND_ROWS()', PDO::FETCH_COLUMN, 0);
 		$overalCount = $stmt->fetch();
-		
+
 		return array('list' => $users, 'overal_count' => $overalCount);
 	}
 	

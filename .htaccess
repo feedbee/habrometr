@@ -1,14 +1,22 @@
 RewriteEngine on
 
+# Habrometers
 RewriteRule ^habrometr_(\d*)x(\d*)(\.php|\.png)$ informer.php?w=$1&h=$2&%{QUERY_STRING} [L]
 RewriteRule ^habrometr_(\d*)x(\d*)_([a-zA-Z0-9\-_]{1,100})(\.php|\.png)$ informer.php?w=$1&h=$2&user=$3 [L]
 
-
+# Special routes
 RewriteRule ^index.php$ index.php [L]
 RewriteRule ^users(/order-by-([^/]+))?(/page-(\d+))?/$ index.php?action=all_users&page=$4&order=$2 [L]
 RewriteRule ^users/([^/]+)/get/$ index.php?action=get&user=$1 [L]
 RewriteRule ^users/([^/]+)/$ index.php?action=user_page&user=$1 [L]
 
+# Default route
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteRule ^([^/]+)/?$ index.php?action=$1&%{QUERY_STRING} [L]
+
+# Security
+RewriteRule ^(.*/)?\.git - [F,L]
+ErrorDocument 403 "Access Forbidden"
+RewriteRule ^(.*/)?application.log - [F,L]
+ErrorDocument 403 "Access Forbidden"

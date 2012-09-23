@@ -1,6 +1,6 @@
 <?php
 /**
- *  Habrarabr.ru Habrometr.
+ *  Habrahabr.ru Habrometr.
  *  Copyright (C) 2009 Leontyev Valera
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -17,21 +17,17 @@
  *  along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+require __DIR__ . '/bootstrap.php';
+
 $timeStart = microtime(true);
-
-set_include_path(dirname(__FILE__) . PATH_SEPARATOR . 
-	realpath(dirname(__FILE__) . '/lib') . PATH_SEPARATOR . get_include_path());
-require('Lpf/Loader.php');
-
-Lpf_Loader::loadClass('Lpf_ErrorHandler');
-set_exception_handler(array('Lpf_ErrorHandler', 'exceptionHandler'));
-Lpf_Loader::registerAutoload();
 
 if (isset($_GET['user']))
 {
 	$user = $_GET['user'];
 	if (!preg_match('#[a-zA-Z0-9\-_]{1,100}#', $user))
-		Habrometr_Informer::showError('User not found');
+	{
+		Habrometr_Informer::showError('User not found', 425, 120);
+	}
 }
 else
 {
@@ -42,7 +38,9 @@ if (isset($_GET['w']))
 {
 	$width = $_GET['w'];
 	if (!ctype_digit($width))
+	{
 		Habrometr_Informer::showError("Width must be an integer ($width given)", 425, 120);
+	}
 }
 else
 {
@@ -53,7 +51,9 @@ if (isset($_GET['h']))
 {
 	$height = $_GET['h'];
 	if (!ctype_digit($height))
+	{
 		Habrometr_Informer::showError("Height must be an integer ($height given)", $width, 120);
+	}
 }
 else
 {
@@ -78,24 +78,35 @@ $informer = new $className($user);
 // Is user's habrometr cached?
 if ($informer->existsInCache())
 {
+	Log::info(sprintf('informer.php: informer `%s` loaded from cache', $className));
 	$informer->printFromCache();
 	exit;
 }
 
 if (!$informer->prepare())
 {
+	Log::err('Informer preparing failed');
 	throw new Exception('Informer preparing failed');
 }
 
 if (!$informer->build())
 {
+	Log::err('Informer building failed');
 	throw new Exception('Informer building failed');
 }
 
 $informer->printCanvas();
-$informer->saveToCache();
+try
+{
+	$informer->saveToCache();
+}
+catch (Exception $e)
+{
+	Log::warn(sprintf('informer.php: exception thrown while trying to save informer to cache: `%s`',
+		$e->getMessage()));
+}
 $informer->destroyCanvas();
 
 $timeFull = microtime(true) - $timeStart;
-file_put_contents(dirname(__FILE__) . '/../generation_log.txt',
-	"{$_SERVER['REQUEST_URI']}\t{$timeFull}\t" . date('Y-m-d H:i:s') . "\n", FILE_APPEND);
+Log::info(sprintf('informer.php: informer `%s` created, generated in %f seconds',
+	$className, $timeFull));

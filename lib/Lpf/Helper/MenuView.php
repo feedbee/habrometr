@@ -1,6 +1,6 @@
 <?php
 /**
- *  Habrarabr.ru Habrometr.
+ *  Habrahabr.ru Habrometr.
  *  Copyright (C) 2009 Leontyev Valera
  *
  *  This program is free software: you can redistribute it and/or modify

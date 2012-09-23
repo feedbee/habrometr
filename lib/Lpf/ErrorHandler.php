@@ -1,6 +1,6 @@
 <?php
 /**
- *  Habrarabr.ru Habrometr.
+ *  Habrahabr.ru Habrometr.
  *  Copyright (C) 2009 Leontyev Valera
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -31,21 +31,29 @@ class Lpf_ErrorHandler
 	static public function exceptionHandler($exception)
 	{
 		error_log("Unhandled exception: Code {$exception->getCode()}; Message: {$exception->getMessage()}");
-		if (defined('DEBUG') && DEBUG == true)
+		if (class_exists('Log') && !is_null(Log::getLogger()))
 		{
-			die("Unhandled exception: Code {$exception->getCode()}; Message: {$exception->getMessage()}");
+			Log::err(sprintf('Lpf_ExceptionHandler: Unhandled exception [%s] `%s`',
+				$exception->getCode(), $exception->getMessage()));
+		}
+
+		if (Config::DEBUG_MODE)
+		{
+			echo "[Debug mode] Unhandled exception: Code {$exception->getCode()}; Message: {$exception->getMessage()}\r\n";
+			echo $exception->getTraceAsString();
+			exit;
 		}
 		else
 		{
 			if ($exception->getCode() == 404)
 			{
 				header("HTTP/1.0 404 Not Found", true, 404);
-				die('<p align=center><font size=6>Error 404: Page Not Found</font></p>');
+				die('<h1 style="text-align:center;">Error 404: Page Not Found</h1>');
 			}
 			else
 			{
 				header("HTTP/1.0 500 Internal Server Error", true, 500);
-				die('<p align=center><font size=6>Error 500: Internal Server Error</font></p>');
+				die('<h1 style="text-align:center;">Error 500: Internal Server Error</h1>');
 			}
 		}
 	}	
