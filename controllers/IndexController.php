@@ -31,9 +31,10 @@ class IndexController
 	
 	public function allUsersAction()
 	{
-		$itemsPerPage = 30;
+		$itemsPerPage = 3;
 
 		// Defaults
+		$filter = null;
 		$orderField = 'user_id';
 		$orderDirection = 'ASC';
 		$userRequestedOrder = null;
@@ -46,6 +47,10 @@ class IndexController
 			{
 				$page = $_REQUEST['page'];
 			}
+		}
+		if (isset($_REQUEST['filter']) && $_REQUEST['filter'] !== '')
+		{
+			$filter = $_REQUEST['filter'];
 		}
 		if (isset($_REQUEST['order']))
 		{
@@ -67,12 +72,13 @@ class IndexController
 		}
 
 		$from = ($page - 1) * $itemsPerPage;
+		$filterArray = is_null($filter) ? array() : array(array('user_code', $filter)); // @TODO: use it as first parameter of getUserList v2
 		$result = Habrometr_Model::getInstance()->getUserList($orderField, $orderDirection, $from, $itemsPerPage);
 		$userList = $result['list'];
 		$overalCount = $result['overal_count'];
 		$overalPages = ceil($overalCount / $itemsPerPage);
 
-		if ($overalPages < $page)
+		if ($overalPages > 0 && $overalPages < $page)
 		{
 			throw new Exception('Error: page not found.', 404);
 		}
@@ -83,9 +89,10 @@ class IndexController
 		$view->page = $page;
 		$view->order = array('field' => $orderField, 'direction' => $orderDirection);
 		$view->requestedOrder = $userRequestedOrder;
+		$view->filter = $filter;
 		$view->overalPages = $overalPages;
 
-		$view->userListPathBuilder = function ($order = null, $page = null)
+		$view->userListPathBuilder = function ($order = null, $page = null, $filter = null)
 		{
 			$parts = array();
 			if (!is_null($order))
@@ -96,13 +103,19 @@ class IndexController
 			{
 				$parts[] = "page-{$page}";
 			}
-			
+
+			$string = '';
 			if (count($parts) > 0)
 			{
-				return implode('/', $parts) . '/';
+				$string = implode('/', $parts) . '/';
 			}
 
-			return '';
+			if (!is_null($filter))
+			{
+				$string .= "?filter=$filter";
+			}
+
+			return $string;
 		};
 	}
 	
