@@ -31,7 +31,7 @@ class IndexController
 	
 	public function allUsersAction()
 	{
-		$itemsPerPage = 3;
+		$itemsPerPage = 30;
 
 		// Defaults
 		$filter = null;
