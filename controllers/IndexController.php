@@ -72,8 +72,8 @@ class IndexController
 		}
 
 		$from = ($page - 1) * $itemsPerPage;
-		$filterArray = is_null($filter) ? array() : array(array('user_code', $filter)); // @TODO: use it as first parameter of getUserList v2
-		$result = Habrometr_Model::getInstance()->getUserList($orderField, $orderDirection, $from, $itemsPerPage);
+		$filterArray = is_null($filter) ? array() : array(array('user_code', $filter));
+		$result = Habrometr_Model::getInstance()->getUserList($filterArray, $orderField, $orderDirection, $from, $itemsPerPage);
 		$userList = $result['list'];
 		$overalCount = $result['overal_count'];
 		$overalPages = ceil($overalCount / $itemsPerPage);

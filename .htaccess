@@ -6,9 +6,9 @@ RewriteRule ^habrometr_(\d*)x(\d*)_([a-zA-Z0-9\-_]{1,100})(\.php|\.png)$ informe
 
 # Special routes
 RewriteRule ^index.php$ index.php [L]
-RewriteRule ^users(/order-by-([^/]+))?(/page-(\d+))?/$ index.php?action=all_users&page=$4&order=$2 [L]
-RewriteRule ^users/([^/]+)/get/$ index.php?action=get&user=$1 [L]
-RewriteRule ^users/([^/]+)/$ index.php?action=user_page&user=$1 [L]
+RewriteRule ^users(/order-by-([^/]+))?(/page-(\d+))?/$ index.php?action=all_users&page=$4&order=$2&%{QUERY_STRING} [L]
+RewriteRule ^users/([^/]+)/get/$ index.php?action=get&user=$1&%{QUERY_STRING} [L]
+RewriteRule ^users/([^/]+)/$ index.php?action=user_page&user=$1&%{QUERY_STRING} [L]
 
 # Default route
 RewriteCond %{REQUEST_FILENAME} !-d

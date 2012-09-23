@@ -484,7 +484,7 @@ class Habrometr_Model
 		try
 		{
 			$sth = $this->_pdo->prepare("INSERT `users` (user_code, user_email) VALUES (:user_code, :user_email)");
-			is_null($values['user_email']) && $values['user_email'] = 'NULL'; // http://us2.php.net/manual/en/pdostatement.bindvalue.php#90625
+			/* @var PDOStatement $sth */
 			$res = $sth->execute($values);
 		}
 		catch (Exception $e)
@@ -514,6 +514,7 @@ class Habrometr_Model
 		try
 		{
 			$sth = $this->_pdo->prepare("DELETE from `users` WHERE user_id = :uid");
+			/* @var PDOStatement $sth */
 			$sth->bindValue(':uid', $userId, PDO::PARAM_INT);
 			$res = $sth->execute();
 		}
@@ -544,6 +545,7 @@ class Habrometr_Model
 		try
 		{
 			$sth = $this->_pdo->prepare("UPDATE `users` SET user_code = :code, user_email = :email WHERE user_id = :uid");
+			/* @var PDOStatement $sth */
 			$sth->bindValue(':uid', $userData['user_id'], PDO::PARAM_INT);
 			$sth->bindValue(':code', $userData['user_code'], PDO::PARAM_INT);
 			$sth->bindValue(':email', $userData['user_email'], PDO::PARAM_INT);
@@ -579,6 +581,7 @@ class Habrometr_Model
 		try
 		{
 			$sth = $this->_pdo->prepare("SELECT user_code FROM `users` where user_id = :uid");
+			/* @var PDOStatement $sth */
 			$sth->bindValue(':uid', $userId, PDO::PARAM_INT);
 			if (!$sth->execute())
 			{
@@ -620,6 +623,7 @@ class Habrometr_Model
 		try
 		{
 			$sth = $this->_pdo->prepare("SELECT user_id FROM `users` where user_code = :ucode");
+			/* @var PDOStatement $sth */
 			$sth->bindValue(':ucode', $code, PDO::PARAM_STR);
 			if (!$sth->execute())
 			{

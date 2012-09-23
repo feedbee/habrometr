@@ -2,7 +2,7 @@
 
 <h1>Получите свой Хаброметр</h1>
 <?php if ($this->ok) { ?>
-<div class="alert alert-success">Регистрация пройдена. <a href="./users/<?php print $this->userCode; ?>">Ваша страница</a>.
+<div class="alert alert-success">Регистрация пройдена. <a href="./users/<?php print $this->userCode; ?>/">Ваша страница</a>.
 	<a href="./users/<?php print $this->userCode; ?>/get/">Код ваших Хаброметров</a>.
 </div>
 <?php } else { ?>
