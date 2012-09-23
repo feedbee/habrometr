@@ -287,6 +287,7 @@ class Habrometr_Model
 		catch (Exception $e)
 		{
 			Log::warn(sprintf("Habrometr_Model: parsing Habrahabr XML user failed", $userCode));
+			Log::warn(sprintf("Habrometr_Model: failed XML string is `%s`", $xmlString));
 			throw new Exception("Parsing Habravalues failure: " . $e->getMessage(), $e->getCode() > 0 ? $e->getCode() : 204);
 		}
 
