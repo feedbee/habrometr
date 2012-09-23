@@ -54,6 +54,7 @@ foreach ($users as $key => $user)
 		$h->pullValues($user);
 		system('rm -f ' . __DIR__ . '/image_cache/habrometr_*_'
 			. escapeshellcmd($user['user_code']) . '.png');
+		Log::debug(sprintf('pull.php: user [%s] %s updated', $key, $user['user_code']));
 	}
 	catch (Exception $e)
 	{
@@ -67,7 +68,6 @@ foreach ($users as $key => $user)
 		}
 	}
 	!$quiet && print "." . (($key+1) % 50 == 0 ? "\r\n" : '');
-	Log::debug(sprintf('pull.php: user [%s] %s updated', $key, $user['user_code']));
 }
 
 $updated = $key + 1;
