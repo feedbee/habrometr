@@ -133,6 +133,7 @@ class Habrometr_Model
 		Log::debug(sprintf("Habrometr_Model: user log access for User ID `%d`", $userId));
 		$sth = $this->_pdo->prepare("SELECT karma_value, habraforce, rate_position, log_time as log_time
 								FROM `karmalog` where user_id = :uid order by log_time DESC limit :limit");
+		/* @var PDOStatement $sth */
 		$sth->bindValue(':limit', $recordsLimit, PDO::PARAM_INT);
 		$sth->bindValue(':uid', $userId, PDO::PARAM_INT);
 		if (!$sth->execute())
@@ -152,7 +153,7 @@ class Habrometr_Model
 	}
 	
 	/**
-	 * Query to DB to get Habravalues groupped by days.
+	 * Query to DB to get Habravalues grouped by days.
 	 * Returns array of values array or null in case of failure.
 	 *
 	 * @param int $userId
@@ -164,6 +165,7 @@ class Habrometr_Model
 		Log::debug(sprintf("Habrometr_Model: grouped user log access for User ID `%d`", $userId));
 		$sth = $this->_pdo->prepare("SELECT avg(karma_value) as karma_value, avg(habraforce) as habraforce, avg(rate_position) as rate_position, DATE(log_time) as `date`
 								FROM `karmalog` where user_id = :uid group by `date` order by `date` DESC LIMIT :limit");
+		/* @var PDOStatement $sth */
 		$sth->bindValue(':limit', $count, PDO::PARAM_INT);
 		$sth->bindValue(':uid', $userId, PDO::PARAM_INT);
 		if (!$sth->execute())
@@ -195,6 +197,7 @@ class Habrometr_Model
 								max(habraforce) as habraforce_max, min(habraforce) as habraforce_min,
 								max(rate_position) as rate_max, min(rate_position) as rate_min
 								FROM `karmalog` WHERE user_id = :uid");
+		/* @var PDOStatement $sth */
 		$sth->bindValue(':uid', $userId, PDO::PARAM_INT);
 		if (!$sth->execute())
 		{
@@ -220,9 +223,8 @@ class Habrometr_Model
 	public function pullValues($user)
 	{
 		$userCode = $user['user_code'];
-		$userId = $user['user_id'];
-		
-		$values = $this->getRemoteValues($userCode);
+
+		$this->getRemoteValues($userCode);
 	}
 
 	/**
@@ -243,6 +245,7 @@ class Habrometr_Model
 		try
 		{
 			$sth = $this->_pdo->prepare("INSERT `karmalog` (user_id, karma_value, habraforce, rate_position) VALUES (:uid, :k, :hf, :r)");
+			/* @var PDOStatement $sth */
 			$sth->bindValue(':uid', $values['user_id']);
 			$sth->bindValue(':k', $values['karma_value']);
 			$sth->bindValue(':hf', $values['habraforce']);
@@ -265,6 +268,7 @@ class Habrometr_Model
 	 * Get user data from Habrahabr web-site in array.
 	 *
 	 * @param string $userCode Habrahabr user code
+	 * @return array
 	 */
 	public function getRemoteValues($userCode)
 	{
@@ -338,6 +342,7 @@ class Habrometr_Model
 	public function getUser($userId)
 	{
 		$sth = $this->_pdo->prepare("SELECT user_id, user_code, user_email FROM `users` WHERE user_id = :uid");
+		/* @var PDOStatement $sth */
 		$sth->bindValue(':uid', $userId, PDO::PARAM_INT);
 		if (!$sth->execute())
 		{
@@ -356,21 +361,49 @@ class Habrometr_Model
 	}
 	
 	/**
-	 * Get registed user list from DB.
+	 * Get registered user list from DB.
 	 * 
 	 * Default values mean all users without any order.
 	 * 
-	 * Returns two demensional array of user information.
+	 * Returns two dimensional array of user information.
 	 *
+	 * @param array $filter array of where conditions
 	 * @param string $orderField user_id, user_code or user_email
 	 * @param string $orderType asc/desc
 	 * @param int $from LIMIT __
 	 * @param int $count LIMIT xx, __
 	 * @return array
 	 */
-	public function getUserList($orderField = null, $orderType = null, $from = null, $count = null)
+	public function getUserList(array $filter = array(), $orderField = null,
+		$orderType = null, $from = null, $count = null)
 	{
 		$sql = 'SELECT user_id, user_code, user_email FROM `users`';
+
+		$conditions = $parameters = array();
+		if (count($filter) > 0)
+		{
+			foreach (array_values($filter) as $index => $element)
+			{
+				if (!is_array($element) || count($element) < 2)
+				{
+					throw new Exception('Habrometr_Model::getUserList: filter array elements must be array with at least 2 elements', 210);
+				}
+				if (!in_array($element[0], array('user_id', 'user_code', 'user_email')))
+				{
+					throw new Exception('Habrometr_Model::getUserList: filter array elements [0] element must be one of: user_id, user_code, user_email', 210);
+				}
+				$field = $element[0];
+				$operator = '=';
+				$parameter = ":{$field}_$index";
+				$conditions[] = "$field $operator $parameter";
+				$parameters[$parameter] = $element[1];
+			}
+
+			if (count($conditions) > 0)
+			{
+				$sql .= "\r\nWHERE " . implode("\r\n AND ", $conditions) . "\r\n";
+			}
+		}
 		if (!is_null($orderField))
 		{
 			if (!in_array($orderField, array('user_id', 'user_code', 'user_email')))
@@ -403,21 +436,26 @@ class Habrometr_Model
 			}
 			$sql .= ', ' . $count;
 		}
+
+		$sth = $this->_pdo->prepare($sql);
+		/* @var PDOStatement $sth */
+		foreach ($parameters as $parameter => $value)
+		{
+			$sth->bindParam($parameter, $value);
+		}
+
+		if (!$sth->execute())
+		{
+			throw new Exception('Habrometr_Model::getUserList — DB query failed: ' . $this->_pdo->errorInfo(), $this->_pdo->errorCode());
+		}
 		
 		$users = array();
-		foreach($this->_pdo->query($sql, PDO::FETCH_ASSOC) as $user)
+		while(false !== ($user = $sth->fetch(PDO::FETCH_ASSOC)))
 		{
 			$users[] = $user;
 		}
-		
-		if ($users)
-		{
-			return $users;
-		}
-		else
-		{
-			return null;
-		}
+
+		return $users;
 	}
 	
 	/**
@@ -438,6 +476,7 @@ class Habrometr_Model
 		try
 		{
 			$sth = $this->_pdo->prepare("INSERT `users` (user_code, user_email) VALUES (:user_code, :user_email)");
+			/* @var PDOStatement $sth */
 			$res = $sth->execute($values);
 		}
 		catch (Exception $e)
@@ -471,17 +510,18 @@ class Habrometr_Model
 		try
 		{
 			$sth = $this->_pdo->prepare("DELETE from `users` WHERE user_id = :uid");
+			/* @var PDOStatement $sth */
 			$sth->bindValue(':uid', $userId, PDO::PARAM_INT);
 			$res = $sth->execute();
 		}
 		catch (Exception $e)
 		{
-			throw new Exception('User deletation — DB query failed: ' . $e->getMessage(), 206);
+			throw new Exception('User deletion — DB query failed: ' . $e->getMessage(), 206);
 		}
 		
 		if (!$res)
 		{
-			throw new Exception('User deletation — DB query failed: ' . $this->_pdo->errorInfo(), $this->_pdo->errorCode());
+			throw new Exception('User deletion — DB query failed: ' . $this->_pdo->errorInfo(), $this->_pdo->errorCode());
 		}
 
 		Log::debug(sprintf("Habrometr_Model: user ID `%d` deleted", $userId));
@@ -503,6 +543,7 @@ class Habrometr_Model
 		try
 		{
 			$sth = $this->_pdo->prepare("UPDATE `users` SET user_code = :code, user_email = :email WHERE user_id = :uid");
+			/* @var PDOStatement $sth */
 			$sth->bindValue(':uid', $userData['user_id'], PDO::PARAM_INT);
 			$sth->bindValue(':code', $userData['user_code'], PDO::PARAM_INT);
 			$sth->bindValue(':email', $userData['user_email'], PDO::PARAM_INT);
@@ -540,6 +581,7 @@ class Habrometr_Model
 		try
 		{
 			$sth = $this->_pdo->prepare("SELECT user_code FROM `users` where user_id = :uid");
+			/* @var PDOStatement $sth */
 			$sth->bindValue(':uid', $userId, PDO::PARAM_INT);
 			if (!$sth->execute())
 			{
@@ -581,6 +623,7 @@ class Habrometr_Model
 		try
 		{
 			$sth = $this->_pdo->prepare("SELECT user_id FROM `users` where user_code = :ucode");
+			/* @var PDOStatement $sth */
 			$sth->bindValue(':ucode', $code, PDO::PARAM_STR);
 			if (!$sth->execute())
 			{

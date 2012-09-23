@@ -33,7 +33,7 @@ class IndexController
 	public function allUsersAction()
 	{
 		$view = Lpf_Dispatcher::getView();
-		$view->userList = Habrometr_Model::getInstance()->getUserList('user_id', 'ASC');
+		$view->userList = Habrometr_Model::getInstance()->getUserList(array(), 'user_id', 'ASC');
 	}
 	
 	public function registerAction()
