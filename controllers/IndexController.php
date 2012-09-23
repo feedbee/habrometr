@@ -50,7 +50,7 @@ class IndexController
 		}
 		if (isset($_REQUEST['filter']) && $_REQUEST['filter'] !== '')
 		{
-			$filter = $_REQUEST['filter'];
+			$filter = trim($_REQUEST['filter']);
 		}
 		if (isset($_REQUEST['order']))
 		{
