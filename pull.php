@@ -45,7 +45,8 @@ Log::info(sprintf('pull.php: verbosity %s', $quiet ? ' disabled' : 'enabled'));
 Log::info('pull.php: update process started ');
 
 $h = Habrometr_Model::getInstance();
-$users = $h->getUserList();
+$list = $h->getUserList();
+$users = $list['list'];
 $errorCounter = 0;
 foreach ($users as $key => $user)
 {
