@@ -55,6 +55,7 @@ foreach ($users as $key => $user)
 		$h->pullValues($user);
 		system('rm -f ' . __DIR__ . '/image_cache/habrometr_*_'
 			. escapeshellcmd($user['user_code']) . '.png');
+		$errorCounter = 0;
 		Log::debug(sprintf('pull.php: user [%s] %s updated', $key, $user['user_code']));
 	}
 	catch (Exception $e)
@@ -62,9 +63,9 @@ foreach ($users as $key => $user)
 		$errorCounter++;
 		!$quiet && print "Error updating user [$key] {$user['user_code']}";
 		Log::err(sprintf('pull.php: error updating user [%s] %s)', $key, $user['user_code']));
-		if ($errorCounter > 30)
+		if ($errorCounter > 20)
 		{
-			Log::crit('pull.php: error counter exceed 30 - break update process)');
+			Log::crit('pull.php: consecutive errors counter exceed 20 - break update process)');
 			break;
 		}
 	}
