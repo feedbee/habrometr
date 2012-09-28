@@ -311,22 +311,28 @@ class Habrometr_Model
 			CURLOPT_ENCODING       => "",       // handle all encodings
 			CURLOPT_USERAGENT      => $agent,   // set user-agent header
 			CURLOPT_AUTOREFERER    => true,     // set referer on redirect
-			CURLOPT_CONNECTTIMEOUT => 120,      // timeout on connect
-			CURLOPT_TIMEOUT        => 120,      // timeout on response
-			CURLOPT_MAXREDIRS      => 10,       // stop after 10 redirects
+			CURLOPT_CONNECTTIMEOUT => 30,       // timeout on connect
+			CURLOPT_TIMEOUT        => 20,       // timeout on response
+			CURLOPT_MAXREDIRS      => 5,       // stop after 10 redirects
 		);
 		curl_setopt_array($ch, $options);
 
 		$time = microtime(true);
 		$page = curl_exec($ch);
-		curl_close($ch);
+
 		$requestTime = (microtime(true) - $time);
 
-		if (!$page)
+		if (false === $page)
 		{
 			Log::warn(sprintf("Habrometr_Model: Habrahabr page loading for user `%s` failed, request time %f seconds",
 				$userCode, $requestTime));
-			throw new Exception("Downloading http://habrahabr.ru/api/profile/{$userCode}/ failed: " . curl_errno($ch) . ' ' . curl_error($ch), 203);
+			$errorMessage = "Downloading http://habrahabr.ru/api/profile/{$userCode}/ failed: " . curl_errno($ch) . ' ' . curl_error($ch);
+			curl_close($ch);
+			throw new Exception($errorMessage, 203);
+		}
+		else
+		{
+			curl_close($ch);
 		}
 
 		Log::debug(sprintf("Habrometr_Model: Habrahabr page loaded for user `%s`, request time %f seconds",
