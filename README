@@ -98,7 +98,7 @@ http {
 
             set $memcached_key "habrometr$uri";
             memcached_pass localhost:11211;
-            error_page 404 502 504 = @backend;
+            error_page 404 405 502 504 = @backend;
             add_header Content-Type "text/html; charset=UTF-8";
             gzip on;
             gzip_proxied any;
