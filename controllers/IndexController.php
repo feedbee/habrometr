@@ -121,21 +121,32 @@ class IndexController
 	
 	public function registerAction()
 	{
+		require_once('ReCaptcha/recaptchalib.php');
+
 		$errors = array();
 		$ok = false;
 		$habravaluesFromXML = null;
 		$user_code = null;
 		$user_email = null;
-		if (isset($_GET['user_code']))
+		if (isset($_POST['user_code']))
 		{
-			$user_code = trim($_GET['user_code']);
+			$recaptchaChallenge = isset($_POST["recaptcha_challenge_field"]) ? $_POST["recaptcha_challenge_field"] : '';
+			$recaptchaUserInput = isset($_POST["recaptcha_response_field"]) ? $_POST["recaptcha_response_field"] : '';
+			$reCaptchaResponse = recaptcha_check_answer (Config::RE_CAPTCHA_KEY_PRIVATE, $_SERVER["REMOTE_ADDR"],
+				$recaptchaChallenge, $recaptchaUserInput);
+			if (!$reCaptchaResponse->is_valid)
+			{
+				$errors[] = 'Неверно введен проверочный код (ReCaptcha): ' . $reCaptchaResponse->error;
+			}
+
+			$user_code = trim($_POST['user_code']);
 			if (!preg_match('#[a-zA-Z0-9\-_]{1,100}#', $user_code))
 			{
 				$errors[] = 'Хабралогин пользователя должен состоять из символов латинского алфавита, цифр и символов "-", "_".';
 			}
-			if (isset($_GET['user_email']) && $_GET['user_email'] !== '')
+			if (isset($_POST['user_email']) && $_POST['user_email'] !== '')
 			{
-				$user_email = trim($_GET['user_email']);
+				$user_email = trim($_POST['user_email']);
 				if (!preg_match("/[0-9A-Za-z_\.]+@[0-9A-Za-z_^\.-]+\.[a-z]{2,4}/i", $user_email))
 				{
 					$errors[] = 'E-mail пользователя должен соответствовать шаблону "user@host.zone".';
@@ -191,7 +202,7 @@ class IndexController
 		}
 		
 		$view = Lpf_Dispatcher::getView();
-		$user = Habrometr_Model::getInstance()->getUser($this->_userId);
+		Habrometr_Model::getInstance()->getUser($this->_userId);
 		$view->userCode = $user_code;
 		$view->userEmail = $user_email;
 		$view->errors = $errors;
