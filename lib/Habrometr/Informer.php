@@ -57,7 +57,7 @@ class Habrometr_Informer
 		}
 		if (!$this->_userId = $this->_habrometr->code2UserId($this->_user))
 		{
-			throw new Exception('User not found.', 300);
+			$this->_showError("User `$user` not found");
 		}
 	}
 	
