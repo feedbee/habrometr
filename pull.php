@@ -7,12 +7,12 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
- * 
+ *
  *  This program is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
- * 
+ *
  *  You should have received a copy of the GNU General Public License
  *  along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
@@ -45,7 +45,8 @@ Log::info(sprintf('pull.php: verbosity %s', $quiet ? ' disabled' : 'enabled'));
 Log::info('pull.php: update process started ');
 
 $h = Habrometr_Model::getInstance();
-$users = $h->getUserList();
+$list = $h->getUserList();
+$users = $list['list'];
 $errorCounter = 0;
 foreach ($users as $key => $user)
 {
@@ -54,6 +55,7 @@ foreach ($users as $key => $user)
 		$h->pullValues($user);
 		system('rm -f ' . __DIR__ . '/image_cache/habrometr_*_'
 			. escapeshellcmd($user['user_code']) . '.png');
+		$errorCounter = 0;
 		Log::debug(sprintf('pull.php: user [%s] %s updated', $key, $user['user_code']));
 	}
 	catch (Exception $e)
@@ -61,9 +63,9 @@ foreach ($users as $key => $user)
 		$errorCounter++;
 		!$quiet && print "Error updating user [$key] {$user['user_code']}";
 		Log::err(sprintf('pull.php: error updating user [%s] %s)', $key, $user['user_code']));
-		if ($errorCounter > 30)
+		if ($errorCounter > 20)
 		{
-			Log::crit('pull.php: error counter exceed 30 - break update process)');
+			Log::crit('pull.php: consecutive errors counter exceed 20 - break update process)');
 			break;
 		}
 	}
