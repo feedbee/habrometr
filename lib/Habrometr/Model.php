@@ -328,6 +328,7 @@ class Habrometr_Model
 				$userCode, $requestTime));
 			$errorMessage = "Downloading http://habrahabr.ru/api/profile/{$userCode}/ failed: " . curl_errno($ch) . ' ' . curl_error($ch);
 			curl_close($ch);
+			Log::warn("Habrometr_Model: $errorMessage");
 			throw new Exception($errorMessage, 203);
 		}
 		else
