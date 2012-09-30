@@ -1,0 +1,26 @@
+## Delete bad users from log
+
+# server side
+cd /var/log/nginx/
+tar cf logs.tar habrometrru.access.log*
+# download logs.tar file
+# local
+tar xf logs.tar
+ruby 01-concatinate-logs.rb . full
+cat full | egrep -ve 'Googlebot|YandexBot|SetLinks|Ezooms' | egrep -e 'GET /habrometr_' > full_filtered
+ruby process-filtered.rb > all
+sort all | uniq > unique
+ruby create-table.rb > table
+# upload file
+scp table <server>:<dir>
+# server side
+mysql -u root -p <table> < table
+
+# mysql
+INSERT INTO bad
+SELECT users.user_id FROM `users`
+LEFT JOIN good on user_code = name
+LEFT JOIN karmalog on users.user_id = karmalog.user_id
+WHERE name is NULL and (user_email is NULL or user_email = 'NULL')
+group by users.user_id
+having max(karma_value) < 5
