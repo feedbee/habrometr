@@ -25,12 +25,12 @@
  * @link http://habrometr.ru/
  * @copyright 2009, feedbee@gmail.com.
  * @license GNU General Public License (GPL).
- * @version 1.0.0
+ * @version 2.0.0
  */
 class Habrometr_Model
 {
-	const VERSION_FULL = '1.0.0';
-	const VERSION = '1.0';
+	const VERSION_FULL = '2.0.0';
+	const VERSION = '2.0';
 
 	/**
 	 * Reference
