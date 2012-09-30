@@ -1,6 +1,6 @@
 Habrometr Source Code.
 
-Version 1.0.
+Version 2.0.
 
 This program collects habrahabr.ru karma, habraforce and habra rate values and
 visualizes it on graphical informers.
@@ -25,10 +25,10 @@ The software published under GPL3 License.
 SOFTWARE DEPENDENCIES
 
 1) HTTP-Webserver (possible Apache);
-2) MySQL Database (4.x and heigher);
-3) PHP 5.1 or heigher with Curl and IMagick extensions;
+2) MySQL Database (5.x and heigher);
+3) PHP 5.1 or heigher with Curl, IMagick and memcache extensions;
 4) Image Magick libs;
-5) [Optional] nginx, eaccelerator.
+5) [Optional] nginx, eaccelerator, memcached.
 
 INSTALLATION
 
@@ -43,11 +43,13 @@ define('DB_USER', 'xxx');
 define('DB_PASS', 'yyy');
 define('DB_NAME', 'zzz');
 define('SERVICE_URL', 'http://localhost/habrometr');
+define('RE_CAPTCHA_KEY_PRIVATE', '=== your private key ==='); // http://www.google.com/recaptcha/
+define('RE_CAPTCHA_KEY_PUBLIC', '=== your public key ===');
 define('DEBUG_MODE', true); // true to dump uncatched exception message, false to
                             // send wordless 404 or 500 responce codes
 define('LOG_LEVEL', 7);     // 0...7 according BSD Syslog message severities
 ---------------------------------------------------------------------------------
-Replace the xxx, yyy, zzz and www-root path with real values.
+Replace the xxx, yyy, zzz, keys and www-root path with real values.
 
 3) Upload all source code to server. Chmod `image_cache` directory to 0777.
 
@@ -146,4 +148,3 @@ http {
         }
     }
 }
- 

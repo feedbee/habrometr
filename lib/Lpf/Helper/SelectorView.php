@@ -1,6 +1,6 @@
 <?php
 /**
- *  Habrahabr.ru Habrometr.
+ *  Habrarabr.ru Habrometr.
  *  Copyright (C) 2009 Leontyev Valera
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -17,10 +17,10 @@
  *  along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-class Lpf_Helper_MenuView extends Lpf_Helper_SwitchViewAbstract
+class Lpf_Helper_SelectorView extends Lpf_Helper_SwitchViewAbstract
 {
 	public function __construct()
 	{
-		$this->setTemplate('menu');
+		$this->setTemplate('selector');
 	}
 }

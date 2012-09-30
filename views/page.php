@@ -1,36 +1,58 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ru">
-
+<!DOCTYPE html>
+<html>
 <head>
-	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<title><?php print $this->title; ?></title>
+	
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<base href="<?php print Config::SERVICE_URL; ?>/" />
-	<link rel="stylesheet" href="./stuff/styles.css" media="all" />
+
+	<link href="./bootstrap/css/bootstrap.min.css" rel="stylesheet">
+	<link rel="stylesheet" href="./css/habrometr.css" media="all" />
+	<style>
+		body {
+			padding-top: 60px; /* 60px to make the container go all the way to the bottom of the topbar */
+		}
+    </style>
+	<!-- IE6-8 support of HTML5 elements -->
+	<!--[if lt IE 9]>
+		<script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+	<![endif]-->
 </head>
+
 <body>
 
-<?php print $this->body; ?>
+<div class="container">
 
-<hr />
+	<?php print $this->body; ?>
 
-<div style="float:left;">&copy; 2009—2012 Валера Леонтьев a.k.a feedbee. habrometr.ru<br />
-	<span style="font-size:80%;color:#333333">Время считается по UTC+0300 (Московское)</span></div>
-
-<div style="float:right;">
-	<!--LiveInternet counter-->
-	<script type="text/javascript"><!--
-	document.write("<a href='http://www.liveinternet.ru/click' "+
-	"target=_blank><img src='http://counter.yadro.ru/hit?t44.1;r"+
-	escape(document.referrer)+((typeof(screen)=="undefined")?"":
-	";s"+screen.width+"*"+screen.height+"*"+(screen.colorDepth?
-	screen.colorDepth:screen.pixelDepth))+";u"+escape(document.URL)+
-	";"+Math.random()+
-	"' alt='' title='LiveInternet' "+
-	"border=0 width=31 height=31><\/a>")//--></script>
-	<!--/LiveInternet-->
 </div>
 
+<footer class="footer">
+	<div class="container">
+		<div style="float:left;">&copy; 2009—2012 Валера Леонтьев a.k.a feedbee. habrometr.ru<br />
+			<span style="font-size:80%;color:#333333">Время считается по UTC+0300 (Московское)</span>
+		</div>
+
+		<div style="float:right;">
+			<!--LiveInternet counter-->
+			<script type="text/javascript"><!--
+			document.write("<a href='http://www.liveinternet.ru/click' "+
+			"target=_blank><img src='http://counter.yadro.ru/hit?t44.1;r"+
+			escape(document.referrer)+((typeof(screen)=="undefined")?"":
+			";s"+screen.width+"*"+screen.height+"*"+(screen.colorDepth?
+			screen.colorDepth:screen.pixelDepth))+";u"+escape(document.URL)+
+			";"+Math.random()+
+			"' alt='' title='LiveInternet' "+
+			"border=0 width=31 height=31><\/a>")//--></script>
+			<!--/LiveInternet-->
+		</div>
+	</div>
+</footer>
+
 <!-- <?php print $_SERVER['REQUEST_URI']; ?> -->
+
+<script src="http://code.jquery.com/jquery-latest.js"></script>
+<script src="./bootstrap/js/bootstrap.min.js"></script>
 
 <script type="text/javascript">
 	var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
@@ -43,6 +65,3 @@
 	pageTracker._trackPageview();
 	} catch(err) {}
 </script>
-
-</body>
-</html>

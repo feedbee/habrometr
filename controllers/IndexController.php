@@ -22,8 +22,7 @@ class IndexController
 		$view = Lpf_Dispatcher::getView();
 		
 		$view->getHelper('menuView')->setElements(array(
-			'/' => array('url' => './', 'text' => 'О Хаброметре'),
-			'/users' => array('url' => './users/', 'text' => 'Список всех пользователей'),
+			'/users' => array('url' => './users/', 'text' => 'Пользователи'),
 			'/register' => array('url' => './register/', 'text' => 'Регистрация'),
 			'/source' => array('url' => './source/', 'text' => 'Исходные коды'),
 			'_ext' => array('url' => 'http://habrahabr.ru/post/141049/', 'text' => 'Виджет Mac OS X', 'external' => true)
@@ -32,27 +31,122 @@ class IndexController
 	
 	public function allUsersAction()
 	{
+		$itemsPerPage = 30;
+
+		// Defaults
+		$filter = null;
+		$orderField = 'user_id';
+		$orderDirection = 'ASC';
+		$userRequestedOrder = null;
+		$page = 1;
+
+		// User Input
+		if (isset($_REQUEST['page']))
+		{
+			if (ctype_digit($_REQUEST['page']) && $_REQUEST['page'] > 0)
+			{
+				$page = $_REQUEST['page'];
+			}
+		}
+		if (isset($_REQUEST['filter']) && $_REQUEST['filter'] !== '')
+		{
+			$filter = trim($_REQUEST['filter']);
+		}
+		if (isset($_REQUEST['order']))
+		{
+			$parts = explode('.', $_REQUEST['order']);
+			if (in_array(count($parts), array(1, 2)))
+			{
+				if (in_array(strtolower($parts[0]), array('name', 'regtime')))
+				{
+					$orderField = ($parts[0] == 'name' ? 'user_code' : 'user_id');
+					$userRequestedOrder = $parts[0];
+
+					if (isset($parts[1]) && in_array(strtolower($parts[1]), array('asc', 'desc')))
+					{
+						$orderDirection = strtoupper($parts[1]);
+						$userRequestedOrder .= ".{$parts[1]}";
+					}
+				}
+			}
+		}
+
+		$from = ($page - 1) * $itemsPerPage;
+		$filterArray = is_null($filter) ? array() : array(array('user_code', $filter));
+		$result = Habrometr_Model::getInstance()->getUserList($filterArray, $orderField, $orderDirection, $from, $itemsPerPage);
+		$userList = $result['list'];
+		$overalCount = $result['overal_count'];
+		$overalPages = ceil($overalCount / $itemsPerPage);
+
+		if ($overalPages > 0 && $overalPages < $page)
+		{
+			throw new Exception('Error: page not found.', 404);
+		}
+
 		$view = Lpf_Dispatcher::getView();
-		$view->userList = Habrometr_Model::getInstance()->getUserList(array(), 'user_id', 'ASC');
+		$view->userList = $userList;
+		$view->usersOveral = $overalCount;
+		$view->page = $page;
+		$view->order = array('field' => $orderField, 'direction' => $orderDirection);
+		$view->requestedOrder = $userRequestedOrder;
+		$view->filter = $filter;
+		$view->overalPages = $overalPages;
+
+		$view->userListPathBuilder = function ($order = null, $page = null, $filter = null)
+		{
+			$parts = array();
+			if (!is_null($order))
+			{
+				$parts[] = "order-by-{$order}";
+			}
+			if (!is_null($page))
+			{
+				$parts[] = "page-{$page}";
+			}
+
+			$string = '';
+			if (count($parts) > 0)
+			{
+				$string = implode('/', $parts) . '/';
+			}
+
+			if (!is_null($filter))
+			{
+				$string .= "?filter=$filter";
+			}
+
+			return $string;
+		};
 	}
 	
 	public function registerAction()
 	{
+		require_once('ReCaptcha/recaptchalib.php');
+
 		$errors = array();
 		$ok = false;
 		$habravaluesFromXML = null;
 		$user_code = null;
 		$user_email = null;
-		if (isset($_GET['user_code']))
+		if (isset($_POST['user_code']))
 		{
-			$user_code = trim($_GET['user_code']);
+			$recaptchaChallenge = isset($_POST["recaptcha_challenge_field"]) ? $_POST["recaptcha_challenge_field"] : '';
+			$recaptchaUserInput = isset($_POST["recaptcha_response_field"]) ? $_POST["recaptcha_response_field"] : '';
+			$reCaptchaResponse = recaptcha_check_answer (Config::RE_CAPTCHA_KEY_PRIVATE, $_SERVER["REMOTE_ADDR"],
+				$recaptchaChallenge, $recaptchaUserInput);
+			if (!$reCaptchaResponse->is_valid)
+			{
+				$errors[] = 'Неверно введен проверочный код (ReCaptcha): ' . $reCaptchaResponse->error;
+			}
+
+			$user_code = trim($_POST['user_code']);
 			if (!preg_match('#[a-zA-Z0-9\-_]{1,100}#', $user_code))
 			{
 				$errors[] = 'Хабралогин пользователя должен состоять из символов латинского алфавита, цифр и символов "-", "_".';
 			}
-			if (isset($_GET['user_email']) && $_GET['user_email'] !== '')
+			if (isset($_POST['user_email']) && $_POST['user_email'] !== '')
 			{
-				$user_email = trim($_GET['user_email']);
+				$user_email = trim($_POST['user_email']);
 				if (!preg_match("/[0-9A-Za-z_\.]+@[0-9A-Za-z_^\.-]+\.[a-z]{2,4}/i", $user_email))
 				{
 					$errors[] = 'E-mail пользователя должен соответствовать шаблону "user@host.zone".';
@@ -108,7 +202,7 @@ class IndexController
 		}
 		
 		$view = Lpf_Dispatcher::getView();
-		$user = Habrometr_Model::getInstance()->getUser($this->_userId);
+		Habrometr_Model::getInstance()->getUser($this->_userId);
 		$view->userCode = $user_code;
 		$view->userEmail = $user_email;
 		$view->errors = $errors;

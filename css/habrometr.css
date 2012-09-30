@@ -1,0 +1,41 @@
+.logo {
+	margin-left: -0.42em;
+    margin-top: -0.405em;
+
+    float: left;
+}
+.footer {
+	padding: 2em 0;
+	margin-top: 2em;
+	border-top: 1px solid #E5E5E5;
+	background-color: whiteSmoke;
+}
+
+.habra-author {
+	padding-left: 1em;
+	background: url("../stuff/bg-user2.gif") no-repeat scroll 0 center transparent;
+}
+
+a.label
+{
+	text-decoration: underline;
+}
+.label-transparent, .badge-transparent {
+	background-color: transparent;
+	color: black;
+}
+a.label-transparent:hover, a.badge-transparent:hover,
+a.label-transparent, a.badge-transparent {
+	color: #0088CC;
+	text-shadow: none;
+}
+
+#recaptcha_response_field { /* fix ReCaptcha inline styles */
+    border: 1px solid #CCCCCC !important;
+    width: 288px !important;
+}
+#registration-comment {
+    width: 441px;
+    line-height: 14px;
+    margin-top: 10px;
+}

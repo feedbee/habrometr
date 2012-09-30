@@ -92,7 +92,7 @@ class Habrometr_Informer
 	}
 	
 	/**
-	 * Print builded image.
+	 * Print built image.
 	 * Call it only after Habrometr_Informer::build() was called.
 	 * 
 	 * If informer exists in cache, use Habrometr_Informer::printFromCache().

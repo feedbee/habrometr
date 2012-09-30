@@ -1,6 +1,6 @@
 <?php
 /**
- *  Habrahabr.ru Habrometr.
+ *  Habrarabr.ru Habrometr.
  *  Copyright (C) 2009 Leontyev Valera
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -17,10 +17,20 @@
  *  along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-class Lpf_Helper_MenuView extends Lpf_Helper_SwitchViewAbstract
+class Lpf_Helper_Flection
 {
-	public function __construct()
+	public function __invoke($number, array $flections)
 	{
-		$this->setTemplate('menu');
+		if ( $number % 10 == 1 && $number % 100 != 11 )
+		{
+			return $flections[0];
+		}
+
+		if ( $number % 10 >= 2 && $number % 10 <= 4 && ( $number % 100 < 10 || $number % 100 >= 20 ) )
+		{
+			return $flections[1];
+		}
+
+		return $flections[2];
 	}
 }

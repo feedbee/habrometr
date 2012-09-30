@@ -506,8 +506,12 @@ class Habrometr_Model
 		{
 			throw new Exception('User addition — DB query failed: ' . $this->_pdo->errorInfo(), $this->_pdo->errorCode());
 		}
+		$newUserId = $this->_pdo->lastInsertId();
 
-		return $this->_pdo->lastInsertId();
+		$creatorIp = isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : '[undefined]';
+		Log::debug(sprintf("Habrometr_Model: new user created with ID `%d` (creator IP is %s)", $newUserId, $creatorIp));
+
+		return $newUserId;
 	}
 	
 	/**
@@ -530,13 +534,15 @@ class Habrometr_Model
 		}
 		catch (Exception $e)
 		{
-			throw new Exception('User deletation — DB query failed: ' . $e->getMessage(), 206);
+			throw new Exception('User deletion — DB query failed: ' . $e->getMessage(), 206);
 		}
 		
 		if (!$res)
 		{
-			throw new Exception('User addition — DB query failed: ' . $this->_pdo->errorInfo(), $this->_pdo->errorCode());
+			throw new Exception('User deletion — DB query failed: ' . $this->_pdo->errorInfo(), $this->_pdo->errorCode());
 		}
+
+		Log::debug(sprintf("Habrometr_Model: user ID `%d` deleted", $userId));
 
 		return true;
 	}
@@ -568,8 +574,10 @@ class Habrometr_Model
 		
 		if (!$res)
 		{
-			throw new Exception('User addition — DB query failed: ' . $this->_pdo->errorInfo(), $this->_pdo->errorCode());
+			throw new Exception('User update — DB query failed: ' . $this->_pdo->errorInfo(), $this->_pdo->errorCode());
 		}
+
+		Log::debug(sprintf("Habrometr_Model: user ID `%d` updated", $userData['user_id']));
 
 		return true;
 	}
@@ -595,7 +603,7 @@ class Habrometr_Model
 			$sth->bindValue(':uid', $userId, PDO::PARAM_INT);
 			if (!$sth->execute())
 			{
-				throw new Exception('User addition — DB query failed: ' . $this->_pdo->errorInfo(), $this->_pdo->errorCode());
+				throw new Exception('userId2Code — DB query failed: ' . $this->_pdo->errorInfo(), $this->_pdo->errorCode());
 			}
 			$row = $sth->fetch(PDO::FETCH_ASSOC);
 		}
@@ -637,7 +645,7 @@ class Habrometr_Model
 			$sth->bindValue(':ucode', $code, PDO::PARAM_STR);
 			if (!$sth->execute())
 			{
-				throw new Exception('User addition — DB query failed: ' . $this->_pdo->errorInfo(), $this->_pdo->errorCode());
+				throw new Exception('code2UserId — DB query failed: ' . $this->_pdo->errorInfo(), $this->_pdo->errorCode());
 			}
 			$row = $sth->fetch(PDO::FETCH_ASSOC);
 		}
@@ -656,5 +664,4 @@ class Habrometr_Model
 			return null;
 		}
 	}
-
 }

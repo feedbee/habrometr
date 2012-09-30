@@ -44,6 +44,9 @@ class Config
 	const DB_PASS = DB_PASS;
 	const DB_NAME = DB_NAME;
 
+	const RE_CAPTCHA_KEY_PRIVATE = RE_CAPTCHA_KEY_PRIVATE;
+	const RE_CAPTCHA_KEY_PUBLIC = RE_CAPTCHA_KEY_PUBLIC;
+
 	const SERVICE_URL = SERVICE_URL;
 	const SERVICE_NAME = 'Хаброметр';
 }

@@ -77,12 +77,13 @@ class Lpf_View
 	
 	public function __call($name, $params)
 	{
-		if (!isset($this->_helpers[$name]))
+		$helper = $this->getHelper($name);
+		if (is_null($helper))
 		{
 			throw new Exception('Call to undefined helper "'.$name.'"');
 		}
 		
-		return $this->getHelper($name)->$name($params);
+		return call_user_func_array($helper, $params);
 	}
 	
 	/**
@@ -126,32 +127,31 @@ class Lpf_View
 		return null;
 	}
 	
-	public function addHelper($helperName)
+	public function addHelper($helperName, $helperObject)
 	{
-		if (isset($this->_helpers[$helperName]))
-		{
-			return null;
-		}
-		
-		$this->_helpers[$helperName] = null;
-		return true;
+		//$this->_helpers[$helperName] = $helperObject;
+	}
+	public function removeHelper($helperName)
+	{
+		//unset($this->_helpers[$helperName]);
 	}
 	
 	public function getHelper($helperName)
 	{
-		if (!isset($this->_helpers[$helperName]))
+		if (isset($this->_helpers[$helperName]))
 		{
-			$this->addHelper($helperName);
+			return $this->_helpers[$helperName];
+		}
+		else
+		{
+			$helperClassName = 'Lpf_Helper_' . ucfirst($helperName);
+			if (class_exists($helperClassName))
+			{
+				$this->_helpers[$helperName] = new $helperClassName();
+				return $this->_helpers[$helperName];
+			}
 		}
 		
-		if (!is_object($this->_helpers[$helperName]))
-		{
-			// someHelper => Lpf_Helper_SomeHelper
-			$helperNameReady = strtoupper(substr($helperName, 0, 1)) . substr($helperName, 1);
-			$helperNameReady = 'Lpf_Helper_' . $helperNameReady;
-			$this->_helpers[$helperName] = new $helperNameReady();
-		}
-		
-		return $this->_helpers[$helperName];
+		return null;
 	}
 }
